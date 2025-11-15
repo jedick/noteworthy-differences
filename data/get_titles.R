@@ -11,7 +11,8 @@ process_line <- function(line) {
   splits <- tail(splits[[1]], -1)
   # Get the page titles
   titles <- gsub('\" title=\".*', "", splits)
-  titles
+  # Decode URL escapes
+  URLdecode(titles)
 }
 
 # Get the titles for all lines

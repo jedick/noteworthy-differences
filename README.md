@@ -75,11 +75,10 @@ Estimated MVE (minimum viable eval set):
 
 ## Batch usage (AI alignment)
 
-1. Run `data/get_titles.R` to extract and save page titles from Wikipedia Main Page to `data/wikipedia_titles.txt`.
-   Then run `collect_data.py` to retrieve revision id, timestamp, and introductions (0, 10, and 100 revisions before current).
-   The results are saved to `data/wikipedia_introductions.csv`.
+1. **Initial preparation:** Run `data/get_titles.R` to extract and save the page titles linked from the Wikipedia Main Page to `data/wikipedia_titles.txt`.
+*This is optional; do this to use a newer set of page titles than the ones provided here.*
+  
+2. **Data download:** Run `collect_data.py` to retrieve revision id, timestamp, and page introductions for 0, 10, and 100 revisions before current.
+The results are saved to `data/wikipedia_introductions.csv`.
 
-```sh
-python collect_data.py
-```
 

@@ -1,5 +1,5 @@
 # Noteworthy Differences:
-# AI alignment for identifying noteworthy differences between revisions of Wikipedia articles
+# Classification of noteworthy differences between revisions of Wikipedia articles: an AI alignment project
 # 20251114 jmd version 1
 
 from google import genai
