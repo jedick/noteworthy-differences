@@ -1,4 +1,5 @@
-# Diffipedia: Summarize differences between old and new versions of a Wikipedia article
+# Noteworthy Differences:
+# AI alignment for identifying noteworthy differences between revisions of Wikipedia articles
 # 20251114 jmd version 1
 
 from google import genai
@@ -44,7 +45,9 @@ def analyze(old_version, new_version, prompt_style):
         ),
     )
 
-    return response
+    analysis = json.loads(response.text)
+
+    return analysis
 
 
 def run_analysis(example_number):
@@ -69,8 +72,7 @@ def run_analysis(example_number):
     for prompt_style in prompt_styles:
 
         print(f"Prompt style: {prompt_style}")
-        response = analyze(old_version, new_version, prompt_style)
-        analysis = json.loads(response.text)
+        analysis = analyze(old_version, new_version, prompt_style)
 
         if analysis["different"]:
             print(f"✓ Noteworthy Differences: True")

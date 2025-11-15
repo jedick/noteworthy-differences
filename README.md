@@ -1,17 +1,43 @@
-# Diffipedia
+# Noteworthy Differences
 
-Analyze differences between old and new versions of a Wikipedia article
+This is an AI alignment project.
 
-## Usage
+The data are old and new versions of Wikipedia articles.
+Two prompts for GenAI models are used to classify differences between the versions as noteworthy or not.
+Where the classification pairs (one from each prompt) disagree with one another, human and AI judges independently make a decision.
+Looking at where the human and AI judges disagree is how we gather examples and failure modes to improve the AI judge.
+
+## Interactive usage
+
+The first example retrieves old and new versions of an introduction from a Wikipedia article.
 
 ```python
-from diffipedia import run_analysis
-run_analysis(2)
+from wiki_data_fetcher import *
+
+# You can get a revision of a given age
+title = "Albert Einstein"
+new_info = get_revision_from_age(title, age_days = 0)
+# Or get a given revision before the current one
+json_data = get_previous_revisions(title, revisions = 100)
+old_info = extract_revision_info(json_data, 100)
+
+# new_info and old_info are dictionaries:
+# {'revid': 1143737878, 'timestamp': '2023-03-09T15:49:20Z'}
+# Now get the introduction (the text before the first <h2> heading) for each revision
+new_version = get_wikipedia_introduction(title, new_info["revid"])
+old_version = get_wikipedia_introduction(title, old_info["revid"])
+```
+
+The second example runs a model to classify the differences between the versions.
+
+```python
+from create_examples import *
+analyze(old_version, new_version, "heuristic")
 ```
 
 ```
-✓ Different: True
-Summary: The new version adds a death date for James Watson (November 6, 2025) and includes a more critical assessment of his treatment of Rosalind Franklin, specifically mentioning derogatory comments and criticism for misogyny.
+{'different': True,
+ 'rationale': 'The differences are noteworthy because the new version adds the specific outcome of Einstein\'s recommendation (the Manhattan Project), clarifies his famous objection to quantum theory with a direct quote ("God does not play dice"), and provides the full rationale for his Nobel Prize, all of which add significant details about major events and his views.'}
 ```
 
 ## AI alignment
@@ -46,3 +72,14 @@ Estimated MVE (minimum viable eval set):
 - 200 examples: 50 articles x 2 time spans (100-current and 10-current) x 2 classifiers (heuristic and few-shot)
 - Expect ca. 20 examples where classifiers disagree
 - Of these, expect ca. 10 examples where AI and human judges disagree
+
+## Batch usage (AI alignment)
+
+1. Run `data/get_titles.R` to extract and save page titles from Wikipedia Main Page to `data/wikipedia_titles.txt`.
+   Then run `collect_data.py` to retrieve revision id, timestamp, and introductions (0, 10, and 100 revisions before current).
+   The results are saved to `data/wikipedia_introductions.csv`.
+
+```sh
+python collect_data.py
+```
+
