@@ -1,81 +1,69 @@
-# Noteworthy Differences:
-# Classification of noteworthy differences between revisions of Wikipedia articles: an AI alignment project
-# 20251114 jmd version 1
-
-from google import genai
-from google.genai import types
-from pydantic import BaseModel
-from dotenv import load_dotenv
-import json
-import os
-from prompts import analyzer_prompts
-
-# Loads GEMINI_API_KEY
-load_dotenv(dotenv_path=".env", override=True)
-
-# Initialize the Gemini LLM
-client = genai.Client()
+import pandas as pd
+from models import classify
 
 
-def analyze(old_version, new_version, prompt_style):
+def run_classifier(row):
     """
-    Analyze differences between versions of a Wikipedia article
+    Run the model on one row of data from 'data/wikipedia_introductions.csv'.
+    The model is run up to four times: two prompt styles (heuristic and few-shot)
+    and two revision intervals (from 10th and 100th previous revisions to current).
+
+    Usage:
+
+    df = pd.read_csv("data/wikipedia_introductions.csv")
+    row = df.iloc[38]
+    run_classifier(row)
     """
 
-    # Get prompt template for given style
-    prompt_template = analyzer_prompts[prompt_style]
+    # Initialize output dict
+    output = {}
 
-    # Add article versions to prompt
-    prompt = prompt_template.replace("{{old_version}}", old_version).replace(
-        "{{new_version}}", new_version
-    )
+    output["heuristic_10"] = classify(row["intro_10"], row["intro_0"], "heuristic")
+    output["few-shot_10"] = classify(row["intro_10"], row["intro_0"], "few-shot")
+    output["heuristic_100"] = classify(row["intro_100"], row["intro_0"], "heuristic")
+    output["few-shot_100"] = classify(row["intro_100"], row["intro_0"], "few-shot")
 
-    # Define response schema
-    class Response(BaseModel):
-        different: bool
-        rationale: str
-
-    # Generate response
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=Response.model_json_schema(),
-        ),
-    )
-
-    analysis = json.loads(response.text)
-
-    return analysis
+    return output
 
 
-def run_analysis(example_number):
+if __name__ == "__main__":
+
     """
-    Run the model using two prompt styles for a given example in the 'data' directory.
-    Print the results to the console.
+    Run the classifier on all rows from 'data/wikipedia_introductions.csv' and save results in 'data/examples.csv'.
     """
 
-    # Pad example_number, e.g. 1 becomes "01"
-    padded_number = str(example_number).zfill(2)
+    # Read the data
+    df = pd.read_csv("data/wikipedia_introductions.csv")
 
-    file_path = os.path.join("data", f"{padded_number}_old.txt")
-    with open(file_path, "r") as f:
-        old_version = f.read()
+    # For reference: Find row indices with at least one missing value
+    # missing_rows = df.index[df.isnull().any(axis=1)].tolist()
+    # print("\nRow indices with missing values:", missing_rows)
 
-    file_path = os.path.join("data", f"{padded_number}_new.txt")
-    with open(file_path, "r") as f:
-        new_version = f.read()
+    # Initialize output data frame
+    df_out = None
 
-    # Loop over prompt styles
-    prompt_styles = ["heuristic", "few-shot"]
-    for prompt_style in prompt_styles:
-
-        print(f"Prompt style: {prompt_style}")
-        analysis = analyze(old_version, new_version, prompt_style)
-
-        if analysis["different"]:
-            print(f"✓ Noteworthy Differences: True")
+    for index, row in df.iterrows():
+        # Print the title to see progress
+        print(row["title"])
+        # Run classifier
+        output = run_classifier(row)
+        print(output)
+        # Create column names and row for data frame
+        column_names = [
+            outer_k + "_" + inner_k
+            for outer_k in output.keys()
+            for inner_k in output[outer_k].keys()
+        ]
+        row_values = [
+            inner_v for outer_k in output.keys() for inner_v in output[outer_k].values()
+        ]
+        # Add title to output
+        column_names = ["title"] + column_names
+        row_values = [row["title"]] + row_values
+        df_row = pd.DataFrame([row_values], columns=column_names)
+        if df_out is None:
+            df_out = df_row
         else:
-            print(f"✗ Noteworthy Differences: False")
-        print(f"{analysis['rationale']}\n")
+            df_out = pd.concat([df_out, df_row])
+        # Write CSV in every loop to avoid data loss if errors occur
+        df_out.to_csv("data/examples.csv", index=False, encoding="utf-8")

@@ -78,7 +78,9 @@ Estimated MVE (minimum viable eval set):
 1. **Initial preparation:** Run `data/get_titles.R` to extract and save the page titles linked from the Wikipedia Main Page to `data/wikipedia_titles.txt`.
 *This is optional; do this to use a newer set of page titles than the ones provided here.*
   
-2. **Data download:** Run `collect_data.py` to retrieve revision id, timestamp, and page introductions for 0, 10, and 100 revisions before current.
+2. **Collect data:** Run `collect_data.py` to retrieve revision id, timestamp, and page introductions for 0, 10, and 100 revisions before current.
 The results are saved to `data/wikipedia_introductions.csv`.
 
-
+3. **Create examples:** Run `create_examples.py` to run the classifier and save the results to 'data/examples.csv'.
+The model is run up to four times for each example:
+two prompt styles (heuristic and few-shot) and two revision intervals (from 10th and 100th previous revisions to current).
