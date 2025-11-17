@@ -36,11 +36,11 @@ analyze(old_version, new_version, "heuristic")
 ```
 
 ```
-{'different': True,
+{'noteworthy': True,
  'rationale': 'The differences are noteworthy because the new version adds the specific outcome of Einstein\'s recommendation (the Manhattan Project), clarifies his famous objection to quantum theory with a direct quote ("God does not play dice"), and provides the full rationale for his Nobel Prize, all of which add significant details about major events and his views.'}
 ```
 
-## AI alignment
+## AI alignment: overview
 
 There are three AI agents: two classifiers and a judge.
 The judge only comes in when the classifiers disagree.
@@ -73,14 +73,29 @@ Estimated MVE (minimum viable eval set):
 - Expect ca. 20 examples where classifiers disagree
 - Of these, expect ca. 10 examples where AI and human judges disagree
 
-## Batch usage (AI alignment)
+## AI alignment: instructions
 
-1. **Initial preparation:** Run `data/get_titles.R` to extract and save the page titles linked from the Wikipedia Main Page to `data/wikipedia_titles.txt`.
+**Initial preparation:** Run `data/get_titles.R` to extract and save the page titles linked from the Wikipedia Main Page to `data/wikipedia_titles.txt`.
 *This is optional; do this to use a newer set of page titles than the ones provided here.*
   
-2. **Collect data:** Run `collect_data.py` to retrieve revision id, timestamp, and page introductions for 0, 10, and 100 revisions before current.
+1. **Collect data:** Run `collect_data.py` to retrieve revision id, timestamp, and page introductions for 0, 10, and 100 revisions before current.
 The results are saved to `data/wikipedia_introductions.csv`.
 
-3. **Create examples:** Run `create_examples.py` to run the classifier and save the results to 'data/examples.csv'.
+2. **Create examples:** Run `create_examples.py` to run the classifier and save the results to `data/examples.csv`.
 The model is run up to four times for each example:
 two prompt styles (heuristic and few-shot) and two revision intervals (from 10th and 100th previous revisions to current).
+
+3. **Human judge:** Run `data/extract_disagreements.R` to extract the examples where the heuristic and few-shot classifiers disagree.
+These are saved in `data/disagreements_for_human.csv` (only Wikipedia introductions) and `data/disagreements_for_AI.csv` (introductions and classifier responses).
+*Without looking at the classifier responses*, the human judge fills in the `noteworthy` (True/False) and `rationale` columns in the for-human CSV file and saves it as `data/human_judgments.csv`.
+
+# Results
+
+- Wikipedia pages processed: 95
+- Pages with available 10th previous revision: 94; 100th previous revision: 81
+- Revisions classified as noteworthy with heuristic prompt: 29%; few-shot prompt: 35%
+- Pages with disagreements between classifications from heuristic and few-shot prompts: 17
+- Disagreements classified as noteworthy with heuristic prompt: 3; few-shot prompt: 14
+- Disagreements classified as noteworthy by human judge: 11
+- Disagreements coinciding with human judge for heuristic prompt: 5; few-shot prompt: 12
+
