@@ -89,13 +89,17 @@ two prompt styles (heuristic and few-shot) and two revision intervals (from 10th
 These are saved in `data/disagreements_for_human.csv` (only Wikipedia introductions) and `data/disagreements_for_AI.csv` (introductions and classifier responses).
 *Without looking at the classifier responses*, the human judge fills in the `noteworthy` (True/False) and `rationale` columns in the for-human CSV file and saves it as `data/human_judgments.csv`.
 
+4. **AI judge:** Run `judge_disagreements.py` to run the judge on the examples where the classifiers disagree.
+The AI judge only sees the old and new revisions and the rationales from the heuristic and few-shot classifiers (not the human judge's responses).
+The results are saved to `data/AI_judgments.csv`.
+
 # Results
 
 - Wikipedia pages processed: 95
 - Pages with available 10th previous revision: 94; 100th previous revision: 81
 - Revisions classified as noteworthy with heuristic prompt: 29%; few-shot prompt: 35%
 - Pages with disagreements between classifications from heuristic and few-shot prompts: 17
-- Disagreements classified as noteworthy with heuristic prompt: 3; few-shot prompt: 14
-- Disagreements classified as noteworthy by human judge: 11
-- Disagreements coinciding with human judge for heuristic prompt: 5; few-shot prompt: 12
+- Disagreed classifications labeled as noteworthy with heuristic prompt: 3; few-shot prompt: 14
+- Disagreed classifications labeled as noteworthy by human judge: 11
+- Labels coinciding with human judge for heuristic prompt: 5; few-shot prompt: 12
 

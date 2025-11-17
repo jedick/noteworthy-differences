@@ -5,7 +5,7 @@ Decide if the differences between the old and new revisions are noteworthy.
 {{instructions}}
 
 Return a JSON-formatted response with keys for:
-    - 'noteworthy' (True if differences between revisions are noteworth or False if they are not)
+    - 'noteworthy' (True if differences between revisions are noteworthy or False if they are not)
     - 'rationale' (one sentence explaining why the differences are or are not noteworthy, including a summary of the differences)
 
 <old_revision>
@@ -53,3 +53,32 @@ Rationale: The old revision analyzes a book in more depth but does not substanti
 """,
     ),
 }
+
+judge_prompt = """
+You are a judge tasked with settling a disagreement between two classification models.
+The models provide their rationales for classifying differences between old and new revisions of a Wikipedia article as noteworthy or not.
+Use the rationales and revisions to decide whether the differences between revisions really are noteworthy.
+Take time to make an informed decision by looking at the revisions and reasoning about the rationales and any other evidence you have.
+
+{{instructions}}
+
+Return a JSON-formatted response with keys for:
+    - 'noteworthy' (True if differences between revisions are noteworthy or False if they are not)
+    - 'reasoning' (one sentence explaining how you decided whether the differences are or are not noteworthy)
+
+<old_revision>
+{{old_revision}}
+</old_revision>
+
+<new_revision>
+{{new_revision}}
+</new_revision>
+
+<rationale_1>
+{{rationale_1}}
+</rationale_1>
+
+<rationale_2>
+{{rationale_2}}
+</rationale_2>
+"""
