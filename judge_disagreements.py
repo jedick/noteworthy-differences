@@ -15,19 +15,22 @@ if __name__ == "__main__":
     df["reasoning"] = None
 
     for index, row in df.iterrows():
-        # Change this if needed to re-start after errors
-        if index < 17:
+        # Change this if needed (to restart after errors)
+        if index < 0:
             next
         else:
             # Print the title to see progress
             print(row["title"])
             # Run judge
-            output = judge(
-                df.iloc[index]["old_revision"],
-                df.iloc[index]["new_revision"],
-                df.iloc[index]["heuristic_rationale"],
-                df.iloc[index]["few-shot_rationale"],
-            )
+            try:
+                output = judge(
+                    df.iloc[index]["old_revision"],
+                    df.iloc[index]["new_revision"],
+                    df.iloc[index]["heuristic_rationale"],
+                    df.iloc[index]["few-shot_rationale"],
+                )
+            except:
+                output = {"noteworthy": None, "reasoning": None}
             print(output)
             # Update data frame
             df.at[index, "noteworthy"] = output["noteworthy"]

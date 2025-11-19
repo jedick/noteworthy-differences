@@ -10,6 +10,7 @@ import json
 import os
 import pandas as pd
 from prompts import analyzer_prompts, judge_prompt
+from utils import retry_with_backoff
 
 # Loads GEMINI_API_KEY
 load_dotenv(dotenv_path=".env", override=True)
@@ -18,6 +19,7 @@ load_dotenv(dotenv_path=".env", override=True)
 client = genai.Client()
 
 
+@retry_with_backoff()
 def classify(old_revision, new_revision, prompt_style):
     """
     Classify noteworthy differences between revisions of a Wikipedia article
@@ -63,6 +65,7 @@ def classify(old_revision, new_revision, prompt_style):
     return analysis
 
 
+@retry_with_backoff()
 def judge(old_revision, new_revision, rationale_1, rationale_2):
     """
     AI judge to settle disagreements between classifications with different prompts
