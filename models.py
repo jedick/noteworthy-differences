@@ -60,9 +60,7 @@ def classify(old_revision, new_revision, prompt_style):
         ),
     )
 
-    analysis = json.loads(response.text)
-
-    return analysis
+    return json.loads(response.text)
 
 
 @retry_with_backoff()
@@ -122,6 +120,4 @@ def judge(old_revision, new_revision, rationale_1, rationale_2, mode="unaligned"
         ),
     )
 
-    analysis = json.loads(response.text)
-
-    return analysis
+    return json.loads(response.text)

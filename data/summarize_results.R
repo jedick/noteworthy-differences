@@ -24,7 +24,7 @@ t2 <- "; few-shot prompt: "
 output <- c(output, paste0(t1, heuristic_fraction, "%", t2, few.shot_fraction, "%"))
 
 disagree_df <- read.csv("disagreements_for_AI.csv")
-text <- "- Disagreements between heuristic and few-shot prompts:"
+text <- "- Disagreements between heuristic and few-shot model:"
 output <- c(output, paste(text, nrow(disagree_df)))
 
 t1 <- "  - Classified as noteworthy with heuristic prompt: "
