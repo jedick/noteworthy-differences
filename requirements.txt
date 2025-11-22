@@ -2,3 +2,5 @@ google-genai
 pydantic
 pandas
 dotenv
+gradio
+requests
