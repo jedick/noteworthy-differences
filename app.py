@@ -4,6 +4,7 @@ from wiki_data_fetcher import (
     get_revision_from_age,
     get_wikipedia_introduction,
     extract_revision_info,
+    get_random_wikipedia_title,
 )
 from models import classifier, judge
 
@@ -268,7 +269,7 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
 
     with gr.Row():
         title_input = gr.Textbox(
-            label="Wikipedia Page Title", placeholder="e.g., David_Szalay", value=""
+            label="Wikipedia Page Title", placeholder="e.g., Albert Einstein", value=""
         )
         number_input = gr.Number(label="Number", value=100, minimum=0, precision=0)
         unit_dropdown = gr.Dropdown(
@@ -280,8 +281,8 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
             label="Judge Mode",
         )
         with gr.Column():
-            #random_btn = gr.Button("Random Page", variant="primary")
-            submit_btn = gr.Button("Fetch Revisions", variant="primary")
+            random_btn = gr.Button("Get Random Page Title", variant="primary")
+            submit_btn = gr.Button("Fetch Revisions and Run Model", variant="primary")
 
     with gr.Row():
         with gr.Column():
@@ -299,12 +300,12 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
             heuristic_rationale = gr.Textbox(
                 label="Heuristic Model's Rationale",
                 lines=2,
-                max_lines=5,
+                max_lines=7,
             )
             fewshot_rationale = gr.Textbox(
                 label="Few-shot Model's Rationale",
                 lines=2,
-                max_lines=5,
+                max_lines=7,
             )
             judge_reasoning = gr.Textbox(
                 label="Judge's Reasoning",
@@ -328,6 +329,12 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
     heuristic_noteworthy = gr.Checkbox(visible=False)
     fewshot_noteworthy = gr.Checkbox(visible=False)
     judge_noteworthy = gr.Checkbox(visible=False)
+
+    random_btn.click(
+        fn=get_random_wikipedia_title,
+        inputs=None,
+        outputs=[title_input],
+    )
 
     gr.on(
         # Press Enter in textbox or use button to submit

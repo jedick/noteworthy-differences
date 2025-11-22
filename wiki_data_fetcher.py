@@ -16,6 +16,8 @@ def run_get_request(params: dict):
     }
 
     response = requests.get(base_url, params=params, headers=headers)
+    # Handle HTTP errors
+    response.raise_for_status()
 
     try:
         json_data = response.json()
@@ -231,3 +233,25 @@ def get_wikipedia_introduction(title: str, revid: int) -> Dict[str, str]:
     introduction = "\n\n".join(paragraphs)
 
     return introduction
+
+
+def get_random_wikipedia_title():
+    url = "https://en.wikipedia.org/w/api.php"
+    params = {
+        "action": "query",
+        "list": "random",
+        "rnnamespace": 0,
+        "rnlimit": 1,
+        "format": "json",
+    }
+
+    try:
+        json_data = run_get_request(params)
+
+        # Extract the title
+        title = json_data["query"]["random"][0]["title"]
+        return title
+
+    except requests.RequestException as e:
+        print(f"Error fetching random Wikipedia title: {e}")
+        return None
