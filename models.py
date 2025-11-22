@@ -10,7 +10,7 @@ import json
 import os
 import pandas as pd
 from prompts import analyzer_prompts, judge_prompt
-from utils import retry_with_backoff
+from retry_with_backoff import retry_with_backoff
 
 # Loads GEMINI_API_KEY
 load_dotenv(dotenv_path=".env", override=True)
@@ -20,7 +20,7 @@ client = genai.Client()
 
 
 @retry_with_backoff()
-def classify(old_revision, new_revision, prompt_style):
+def classifier(old_revision, new_revision, prompt_style):
     """
     Classify noteworthy differences between revisions of a Wikipedia article
 
@@ -73,7 +73,7 @@ def judge(old_revision, new_revision, rationale_1, rationale_2, mode="unaligned"
         new_revision: New revision of article
         rationale_1: Rationale provided by model 1 (i.e., heuristic prompt)
         rationale_2: Rationale provided by model 2 (i.e., few-shot prompt)
-        mode: Prompt mode: unaligned, aligned, or aligned-heuristic
+        mode: Prompt mode: unaligned, aligned-fewshot, or aligned-heuristic
 
     Returns:
         noteworthy: True if the differences are noteworthy; False if not
@@ -93,12 +93,12 @@ def judge(old_revision, new_revision, rationale_1, rationale_2, mode="unaligned"
     # Optionally add alignment text to prompt
     if mode == "unaligned":
         alignment_text = ""
-    elif mode == "aligned":
-        with open("data/alignment_text.txt", "r") as file:
+    elif mode == "aligned-fewshot":
+        with open("data/alignment_fewshot.txt", "r") as file:
             lines = file.readlines()
             alignment_text = "".join(lines)
     elif mode == "aligned-heuristic":
-        with open("data/alignment_text_heuristic.txt", "r") as file:
+        with open("data/alignment_heuristic.txt", "r") as file:
             lines = file.readlines()
             alignment_text = "".join(lines)
     else:

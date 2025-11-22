@@ -7,7 +7,7 @@ def llm_workflow_logic():
 
     new_revision = """The Kaman-Kalehöyük Archaeological Museum (Turkish: Kaman-Kalehöyük Arkeoloji Müzesi) is an archaeological museum in Çağırkan, Kaman District, Kırşehir Province, Turkey. It exhibits artifacts of seven civilizations excavated in the nearby multi-period mound Kaman-Kalehöyük. It opened in 2010. A Japanese garden is next to the museum building.[1][2]"""
 
-    response = llm_workflow(old_revision, new_revision, "aligned")
+    response = llm_workflow(old_revision, new_revision, "aligned-fewshot")
 
     # The judge should responsd with noteworthy: False regardless of the classifier models' responses
     return response["judge"]["noteworthy"] is False

@@ -1,17 +1,17 @@
-from models import classify, judge
+from models import classifier, judge
 
 
-def llm_workflow(old_revision, new_revision, mode="aligned"):
+def llm_workflow(old_revision, new_revision, mode="aligned-fewshot"):
     """
     Run LLM workflow (input to response)
 
     Args:
-        mode: "aligned" for few-shot alignment or "aligned-heuristic" for heuristic alignment
+        mode: "aligned-fewshot" for few-shot alignment or "aligned-heuristic" for heuristic alignment
     """
 
     # Run classifier and judge models
-    heuristic = classify(old_revision, new_revision, "heuristic")
-    few_shot = classify(old_revision, new_revision, "few-shot")
+    heuristic = classifier(old_revision, new_revision, "heuristic")
+    few_shot = classifier(old_revision, new_revision, "few-shot")
     judge_response = judge(
         old_revision,
         new_revision,

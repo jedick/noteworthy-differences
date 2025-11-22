@@ -15,16 +15,16 @@ if __name__ == "__main__":
     df["noteworthy"] = None
     df["reasoning"] = None
 
-    # We run the unaligned judge unless the script is called with --aligned
+    # We run the unaligned judge unless the script is called with --aligned-fewshot or --aligned--heuristic
     mode = "unaligned"
     outfile = "data/AI_judgments.csv"
     # Check if an argument was passed
     if len(sys.argv) > 1:
         # sys.argv[0] is the script name, sys.argv[1] is the first argument
         argument = sys.argv[1]
-        if argument == "--aligned":
-            mode = "aligned"
-            outfile = "data/AI_judgments_aligned.csv"
+        if argument == "--aligned-fewshot":
+            mode = "aligned-fewshot"
+            outfile = "data/AI_judgments_aligned_fewshot.csv"
         elif argument == "--aligned-heuristic":
             mode = "aligned-heuristic"
             outfile = "data/AI_judgments_aligned_heuristic.csv"

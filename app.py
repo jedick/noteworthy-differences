@@ -5,7 +5,7 @@ from wiki_data_fetcher import (
     get_wikipedia_introduction,
     extract_revision_info,
 )
-from models import classify, judge
+from models import classifier, judge
 
 
 def fetch_current_revision(title: str):
@@ -126,12 +126,10 @@ def run_classifier(old_revision: str, new_revision: str, prompt_style: str):
 
     try:
         # Run classifier model
-        classify_result = classify(
-            old_revision, new_revision, prompt_style=prompt_style
-        )
-        if classify_result:
-            noteworthy = classify_result.get("noteworthy", None)
-            rationale = classify_result.get("rationale", "")
+        result = classifier(old_revision, new_revision, prompt_style=prompt_style)
+        if result:
+            noteworthy = result.get("noteworthy", None)
+            rationale = result.get("rationale", "")
         else:
             error_msg = f"Error: Could not get {prompt_style} model result"
             raise gr.Error(error_msg, print_exception=False)
@@ -166,7 +164,7 @@ def run_judge(
         new_revision: New revision text
         heuristic_rationale: Heuristic model's rationale
         fewshot_rationale: Few-shot model's rationale
-        judge_mode: Mode for judge function ("unaligned", "aligned", "aligned-heuristic")
+        judge_mode: Mode for judge function ("unaligned", "aligned-fewshot", "aligned-heuristic")
 
     Returns:
         Tuple of (noteworthy, reasoning) (bool, str)
@@ -184,16 +182,16 @@ def run_judge(
 
     try:
         # Run judge
-        judge_result = judge(
+        result = judge(
             old_revision,
             new_revision,
             heuristic_rationale,
             fewshot_rationale,
             mode=judge_mode,
         )
-        if judge_result:
-            noteworthy = judge_result.get("noteworthy", "")
-            reasoning = judge_result.get("reasoning", "")
+        if result:
+            noteworthy = result.get("noteworthy", "")
+            reasoning = result.get("reasoning", "")
         else:
             error_msg = f"Error: Could not get judge's result"
             raise gr.Error(error_msg, print_exception=False)
@@ -248,15 +246,25 @@ theme.set(body_background_fill="#FFFFFF", body_background_fill_dark="#000000")
 
 # Create Gradio interface
 with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
-    gr.Markdown(
-        """
-    # Noteworthy Differences
-    Compare the current revision of a Wikipedia article (introduction only) with a revision in the past (number of days or revisions back).<br>
-    Two classifier models, with relatively short heuristic and few-shot prompts, and a judge predict the noteworthiness of the differences.<br>
-    The judge has a longer prompt for AI alignment, also in heuristic or few-shot styles, produced as described in the
-    [GitHub repository](https://github.com/jedick/noteworthy-differences).
-    """
-    )
+    with gr.Row():
+        with gr.Column(scale=2):
+            gr.Markdown(
+                """
+            # Noteworthy Differences
+            Compare the current revision of a Wikipedia article (introduction only) with a revision in the past (number of days or revisions back).<br>
+            Two classifier models, with relatively short heuristic and few-shot prompts, and a judge predict the noteworthiness of the differences.<br>
+            The judge has a longer prompt for AI alignment, also in heuristic or few-shot styles, produced as described in the
+            [GitHub repository](https://github.com/jedick/noteworthy-differences).
+            """
+            )
+        with gr.Column(scale=1):
+            gr.Markdown(
+                """#### Confidence Key
+                - **High:** heuristic = few-shot = judge
+                - **Moderate:** heuristic ≠ few-shot, judge decides
+                - **Questionable:** heuristic = few-shot, judge vetoes
+                """
+            )
 
     with gr.Row():
         title_input = gr.Textbox(
@@ -267,26 +275,19 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
             choices=["days", "revisions"], value="days", label="Unit"
         )
         judge_mode_dropdown = gr.Dropdown(
-            choices=["unaligned", "aligned", "aligned-heuristic"],
+            choices=["unaligned", "aligned-fewshot", "aligned-heuristic"],
             value="aligned-heuristic",
             label="Judge Mode",
         )
         with gr.Column():
+            #random_btn = gr.Button("Random Page", variant="primary")
             submit_btn = gr.Button("Fetch Revisions", variant="primary")
-            rerun_btn = gr.Button("Rerun Model", variant="primary")
 
     with gr.Row():
         with gr.Column():
             gr.Markdown("### Old Revision")
             old_timestamp = gr.Markdown("")
             old_revision = gr.Textbox(label="", lines=15, max_lines=30, container=False)
-            gr.Markdown(
-                """#### Confidence Key
-                - **High:** heuristic = few-shot = judge
-                - **Moderate:** heuristic ≠ few-shot, judge decides
-                - **Questionable:** heuristic = few-shot, judge vetoes
-                """
-            ),
 
         with gr.Column():
             gr.Markdown("### Current Revision")
@@ -297,17 +298,17 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
             gr.Markdown("### Model Output")
             heuristic_rationale = gr.Textbox(
                 label="Heuristic Model's Rationale",
-                lines=3,
+                lines=2,
                 max_lines=5,
             )
             fewshot_rationale = gr.Textbox(
                 label="Few-shot Model's Rationale",
-                lines=3,
+                lines=2,
                 max_lines=5,
             )
             judge_reasoning = gr.Textbox(
                 label="Judge's Reasoning",
-                lines=3,
+                lines=2,
                 max_lines=7,
             )
             with gr.Row(variant="default"):
@@ -321,6 +322,7 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
                     lines=1,
                     interactive=False,
                 )
+            rerun_btn = gr.Button("Rerun Model", variant="primary")
 
     # Hidden checkboxes to store boolean values
     heuristic_noteworthy = gr.Checkbox(visible=False)
@@ -335,22 +337,27 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
         fn=lambda: (gr.update(value=""), gr.update(value="")),
         inputs=None,
         outputs=[new_revision, new_timestamp],
+        api_name=False,
     ).then(
         fn=fetch_current_revision,
         inputs=[title_input],
         outputs=[new_revision, new_timestamp],
+        api_name=False,
     ).then(
         fn=fetch_previous_revision,
         inputs=[title_input, unit_dropdown, number_input, new_revision],
         outputs=[old_revision, old_timestamp],
+        api_name=False,
     ).then(
         fn=run_heuristic_classifier,
         inputs=[old_revision, new_revision],
         outputs=[heuristic_noteworthy, heuristic_rationale],
+        api_name=False,
     ).then(
         fn=run_fewshot_classifier,
         inputs=[old_revision, new_revision],
         outputs=[fewshot_noteworthy, fewshot_rationale],
+        api_name=False,
     ).then(
         fn=run_judge,
         inputs=[
@@ -361,10 +368,12 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
             judge_mode_dropdown,
         ],
         outputs=[judge_noteworthy, judge_reasoning],
+        api_name=False,
     ).then(
         fn=format_noteworthy,
         inputs=[judge_noteworthy, judge_reasoning],
         outputs=[noteworthy_text],
+        api_name=False,
     ).then(
         fn=compute_confidence,
         inputs=[
@@ -376,6 +385,7 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
             judge_reasoning,
         ],
         outputs=[confidence],
+        api_name=False,
     )
 
     # Rerun model when rerun button is clicked
@@ -384,10 +394,12 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
         fn=run_heuristic_classifier,
         inputs=[old_revision, new_revision],
         outputs=[heuristic_noteworthy, heuristic_rationale],
+        api_name=False,
     ).then(
         fn=run_fewshot_classifier,
         inputs=[old_revision, new_revision],
         outputs=[fewshot_noteworthy, fewshot_rationale],
+        api_name=False,
     ).then(
         fn=run_judge,
         inputs=[
@@ -398,10 +410,12 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
             judge_mode_dropdown,
         ],
         outputs=[judge_noteworthy, judge_reasoning],
+        api_name=False,
     ).then(
         fn=format_noteworthy,
         inputs=[judge_noteworthy, judge_reasoning],
         outputs=[noteworthy_text],
+        api_name=False,
     ).then(
         fn=compute_confidence,
         inputs=[
@@ -413,6 +427,7 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
             judge_reasoning,
         ],
         outputs=[confidence],
+        api_name=False,
     )
 
 if __name__ == "__main__":

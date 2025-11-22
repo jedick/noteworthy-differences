@@ -1,5 +1,5 @@
 import pandas as pd
-from models import classify
+from models import classifier
 
 
 def run_classifier(row):
@@ -18,10 +18,10 @@ def run_classifier(row):
     # Initialize output dict
     output = {}
 
-    output["heuristic_10"] = classify(row["intro_10"], row["intro_0"], "heuristic")
-    output["few-shot_10"] = classify(row["intro_10"], row["intro_0"], "few-shot")
-    output["heuristic_100"] = classify(row["intro_100"], row["intro_0"], "heuristic")
-    output["few-shot_100"] = classify(row["intro_100"], row["intro_0"], "few-shot")
+    output["heuristic_10"] = classifier(row["intro_10"], row["intro_0"], "heuristic")
+    output["few-shot_10"] = classifier(row["intro_10"], row["intro_0"], "few-shot")
+    output["heuristic_100"] = classifier(row["intro_100"], row["intro_0"], "heuristic")
+    output["few-shot_100"] = classifier(row["intro_100"], row["intro_0"], "few-shot")
 
     return output
 

@@ -58,7 +58,7 @@ output <- c(output, paste0(text, AI_noteworthy, " (", AI_correct_fraction, "% ac
 #output <- c(output, paste0(text, AI_correct_fraction, "%"))
 
 # aAI: aligned AI
-aAI_judge_df <- read.csv("AI_judgments_aligned.csv")
+aAI_judge_df <- read.csv("AI_judgments_aligned_fewshot.csv")
 aAI_noteworthy <- sum(aAI_judge_df$noteworthy == "True")
 aAI_correct <- sum(aAI_judge_df$noteworthy == human_df$noteworthy)
 aAI_correct_fraction <- round(100*aAI_correct / nrow(aAI_judge_df))

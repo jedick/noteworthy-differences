@@ -10,4 +10,4 @@ stopifnot(all(human_df$title == disagree_df$title))
 human <- paste0("Human: ", human_df$rationale, " Noteworthy: ", human_df$noteworthy, ".")
 
 alignment_text <- paste(paste(classifier_1, classifier_2, human), collapse = "\n")
-writeLines(alignment_text, "alignment_text.txt")
+writeLines(alignment_text, "alignment_fewshot.txt")

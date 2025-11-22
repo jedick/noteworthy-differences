@@ -24,39 +24,13 @@ Here is a summary of the pipeline:
 
 ![Workflow for Noteworthy Differences AI system](image/workflow.png "Noteworthy Differences Workflow")
 
-## Interactive usage
+## Usage
 
-Retrieve old and new revisions of an introduction from a Wikipedia article.
+**Web UI:** Run `python app.py` for a Gradio frontend.
 
-```python
-from wiki_data_fetcher import *
+**Python:** See [usage-examples.md](usage-examples.md) for examples of retrieving Wikipedia page revisions and running classifier and judge models.
 
-# Option 1: Get a revision from n days ago
-title = "Albert Einstein"
-new_info = get_revision_from_age(title, age_days = 0)
-old_info = get_revision_from_age(title, age_days = 10)
-# Option 2: Get the nth revision before current
-json_data = get_previous_revisions(title, revisions = 100)
-old_info = extract_revision_info(json_data, 100)
-
-# new_info and old_info are dictionaries:
-# {'revid': 1143737878, 'timestamp': '2023-03-09T15:49:20Z'}
-# Now get the introduction (the text before the first <h2> heading) for each revision
-new_revision = get_wikipedia_introduction(title, new_info["revid"])
-old_revision = get_wikipedia_introduction(title, old_info["revid"])
-```
-
-Classify the differences between the revisions as noteworthy or not, and provide a rationale.
-
-```python
-from models import *
-classify(old_revision, new_revision, "heuristic")
-```
-
-```
-{'noteworthy': True,
- 'rationale': 'The differences are noteworthy because the new revision adds the specific outcome of Einstein\'s recommendation (the Manhattan Project), clarifies his famous objection to quantum theory with a direct quote ("God does not play dice"), and provides the full rationale for his Nobel Prize, all of which add significant details about major events and his views.'}
-```
+**Pytest:** See `test-models.py` and `test-workflows.py` for pytest fixtures.
 
 ## AI alignment pipeline
 
@@ -82,12 +56,12 @@ the human aligner fills in the `noteworthy` (True/False) and `rationale` columns
 5. **AI judge:** Run `judge_disagreements.py` to run the unaligned judge on the examples where the models disagree.
 The results are saved to `data/AI_judgments.csv`.
 
-6. **Alignment:** Run `data/align_judge.R` to collect the alignment data into `data/alignment_text.txt`.
+6. **Alignment:** Run `data/align_judge.R` to collect the alignment data into `data/alignment_fewshot.txt`.
 The alignment text consist of True/False labels and rationales from the human aligner and rationales from the classifiers.
-A heuristic prompt created from the alignment text using a different LLM is in `data/alignment_text_heuristic.txt`.
+A heuristic prompt created from the alignment text using a different LLM is in `data/alignment_heuristic.txt`.
 
 7. **Evaluate:** Run `judge_disagreements.py --aligned` to run the aligned judge on the examples where the models disagree;
-the results are saved to `data/AI_judgments_aligned.csv`.
+the results are saved to `data/AI_judgments_aligned_fewshot.csv`.
 Then run `data/summarize_results.R` to compute the summary statistics (results listed below).
 
 ## Results
