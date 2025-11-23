@@ -66,32 +66,33 @@ Then run `data/summarize_results.R` to compute the summary statistics (results l
 
 ## Results
 
-- Wikipedia pages processed: 163/91 (train/test)
-- Available 10th previous revision: 162/88; 100th previous revision: 141/79
-- Revisions classified as noteworthy with heuristic prompt: 30%/32%; few-shot prompt: 36%/37%
+| | Train samples | Test samples | Train accuracy | Test accuracy |
+| --- | --- | --- | --- | --- |
+| Wikipedia pages | 163 | 91 |  |  |
+| Total revisions (10 and 100 behind) | 303 | 167 |  |  |
+| Noteworthy classifications by: |  |  |  |  |
+| &emsp;Heuristic classifier | 90 | 53 |  |  |
+| &emsp;Few-shot classifier | 110 | 62 |  |  |
+| Disagreements between classifiers | 26 | 19 |  |  |
+| &emsp;Noteworthy classifications by: |  |  |  |  |
+| &emsp;&emsp;Human annotator | 16 | 8 |  |  |
+| &emsp;&emsp;Unaligned AI judge | 25 | 18 | 58% | 37% |
+| &emsp;&emsp;Few-shot AI judge | 18 | 16 | 92% | 47% |
+| &emsp;&emsp;Heuristic AI judge | 23 | 15 | 65% | 53% |
 
-> [!IMPORTANT]
-> The following results represent the *hard examples*, not the entire dataset.
 
-### Train set
+### Discussion
 
-- Disagreements between heuristic and few-shot models: 26
-  - Classified as noteworthy with heuristic prompt: 3; few-shot prompt: 23
-  - Classified as noteworthy by human aligner: 16
-  - Classified as noteworthy by **unaligned** AI judge: 25 (58% accurate)
-  - Classified as noteworthy by **aligned** AI judge: 18 (92% accurate)
-  - Classified as noteworthy by **aligned** AI judge (heuristic prompt): 23 (65% accurate)
+- The few-shot and heuristic classifiers agree on most classifications (ca. 90%)
+- For revisions where the classifiers disagree ("hard examples"):
+  - The unaligned AI judge classifies the great majority as noteworthy
+  - The human annotator is variable (62% for train samples vs 42% for test samples)
+- The few-shot AI judge **overfits**:
+  - The alignment prompt contains the human annotator's rationales for the hard examples
+  - 34% improvement in train accuracy but only 10% improvement in test accuracy
+- The heuristic AI judge **generalizes**:
+  - Alignment prompt rewritten to heuristic style with Claude
+  - 7% improvement in train accuracy and 16% improvement in test accuracy
+- Accuracy scores are for the hard examples, not the entire dataset
+  - Lower performance on test set may be due to concept drift (i.e., variability of human annotator)
 
-### Test set
-
-- Disagreements between heuristic and few-shot models: 19
-  - Classified as noteworthy with heuristic prompt: 5; few-shot prompt: 14
-  - Classified as noteworthy by human aligner: 8
-  - Classified as noteworthy by **unaligned** AI judge: 18 (37% accurate)
-  - Classified as noteworthy by **aligned** AI judge: 16 (47% accurate)
-  - Classified as noteworthy by **aligned** AI judge (heuristic prompt): 15 (53% accurate)
-
-> [!WARNING]
-> For the hard examples, the proportion of revisions classified as noteworthy
-> by the human annotator decreased from 62% in the train set to 42% in the test set.
-> This looks like a case of concept drift, which requires realignment of the judge.

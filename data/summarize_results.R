@@ -1,80 +1,112 @@
 # Script to summarize results for README.md
 # 20251117 jmd
 
-output <- character()
-
-intro_df <- read.csv("wikipedia_introductions.csv")
-text <- "- Wikipedia pages processed:"
-output <- c(output, paste(text, nrow(intro_df)))
-
-t1 <- "- Available 10th previous revision: "
-t2 <- "; 100th previous revision: "
-output <- c(output, paste0(t1, sum(intro_df$intro_10 != ""), t2, sum(intro_df$intro_100 != "")))
-
-response_df <- read.csv("examples.csv")
-heuristic_noteworthy <- c(response_df$heuristic_10_noteworthy, response_df$heuristic_100_noteworthy)
-heuristic_noteworthy <- heuristic_noteworthy[heuristic_noteworthy != ""]
-heuristic_fraction <- round(100*sum(heuristic_noteworthy == "True") / length(heuristic_noteworthy))
-few.shot_noteworthy <- c(response_df$few.shot_10_noteworthy, response_df$few.shot_100_noteworthy)
-few.shot_noteworthy <- few.shot_noteworthy[few.shot_noteworthy != ""]
-few.shot_fraction <- round(100*sum(few.shot_noteworthy == "True") / length(few.shot_noteworthy))
-
-t1 <- "- Revisions classified as noteworthy with heuristic prompt: "
-t2 <- "; few-shot prompt: "
-output <- c(output, paste0(t1, heuristic_fraction, "%", t2, few.shot_fraction, "%"))
-
-disagree_df <- read.csv("disagreements_for_AI.csv")
-text <- "- Disagreements between heuristic and few-shot model:"
-output <- c(output, paste(text, nrow(disagree_df)))
-
-t1 <- "  - Classified as noteworthy with heuristic prompt: "
-t2 <- "; few-shot prompt: "
-heuristic_dis_noteworthy <- sum(disagree_df$heuristic_noteworthy == "True")
-few.shot_dis_noteworthy <- sum(disagree_df$few.shot_noteworthy == "True")
-output <- c(output, paste0(t1, heuristic_dis_noteworthy, t2, few.shot_dis_noteworthy))
-
-human_df <- read.csv("human_alignments.csv")
-stopifnot(all(human_df$title == disagree_df$title))
-text <- "  - Classified as noteworthy by human aligner:"
-output <- c(output, paste(text, sum(human_df$noteworthy == "True")))
-
-#heuristic_correct <- sum(human_df$noteworthy == disagree_df$heuristic_noteworthy)
-#heuristic_correct_fraction <- round(100*heuristic_correct / nrow(disagree_df))
-#few.shot_correct <- sum(human_df$noteworthy == disagree_df$few.shot_noteworthy)
-#few.shot_correct_fraction <- round(100*few.shot_correct / nrow(disagree_df))
-#
-#t1 <- "  - Accuracy for heuristic prompt: "
-#t2 <- "; few-shot prompt: "
-#output <- c(output, paste0(t1, heuristic_correct_fraction, "%", t2, few.shot_correct_fraction, "%"))
-
-AI_judge_df <- read.csv("AI_judgments.csv")
-AI_noteworthy <- sum(AI_judge_df$noteworthy == "True")
-AI_correct <- sum(AI_judge_df$noteworthy == human_df$noteworthy)
-AI_correct_fraction <- round(100*AI_correct / nrow(AI_judge_df))
-text <- "  - Classified as noteworthy by **unaligned** AI judge: "
-output <- c(output, paste0(text, AI_noteworthy, " (", AI_correct_fraction, "% accurate)"))
-
-#text <- "  - Accuracy for AI judge: "
-#output <- c(output, paste0(text, AI_correct_fraction, "%"))
-
-# aAI: aligned AI
-aAI_judge_df <- read.csv("AI_judgments_aligned_fewshot.csv")
-aAI_noteworthy <- sum(aAI_judge_df$noteworthy == "True")
-aAI_correct <- sum(aAI_judge_df$noteworthy == human_df$noteworthy)
-aAI_correct_fraction <- round(100*aAI_correct / nrow(aAI_judge_df))
-text <- "  - Classified as noteworthy by **aligned** AI judge: "
-output <- c(output, paste0(text, aAI_noteworthy, " (", aAI_correct_fraction, "% accurate)"))
-
-# aAI: aligned AI
-aAI_judge_df <- read.csv("AI_judgments_aligned_heuristic.csv")
-aAI_noteworthy <- sum(aAI_judge_df$noteworthy == "True")
-aAI_correct <- sum(aAI_judge_df$noteworthy == human_df$noteworthy)
-aAI_correct_fraction <- round(100*aAI_correct / nrow(aAI_judge_df))
-text <- "  - Classified as noteworthy by **aligned** AI judge (heuristic prompt): "
-output <- c(output, paste0(text, aAI_noteworthy, " (", aAI_correct_fraction, "% accurate)"))
-
-
-# Print output to terminal and copy to README.md
-if(FALSE) {
-  cat(paste(output, collapse = "\n"), sep = "\n")
+# Function to calculate accuracy
+calc_accuracy <- function(predicted, actual) {
+  if (length(predicted) == 0 || length(actual) == 0) return(NA)
+  if (length(predicted) != length(actual)) return(NA)
+  correct <- sum(predicted == actual)
+  round(100 * correct / length(predicted))
 }
+
+# Read train data
+train_intro_df <- read.csv("train/wikipedia_introductions.csv")
+train_response_df <- read.csv("train/examples.csv")
+train_disagree_df <- read.csv("train/disagreements_for_AI.csv")
+train_human_df <- read.csv("train/human_alignments.csv")
+train_AI_judge_df <- read.csv("train/AI_judgments.csv")
+train_aAI_fewshot_df <- read.csv("train/AI_judgments_aligned_fewshot.csv")
+train_aAI_heuristic_df <- read.csv("train/AI_judgments_aligned_heuristic.csv")
+
+# Read test data
+test_intro_df <- read.csv("test/wikipedia_introductions.csv")
+test_response_df <- read.csv("test/examples.csv")
+test_disagree_df <- read.csv("test/disagreements_for_AI.csv")
+test_human_df <- read.csv("test/human_alignments.csv")
+test_AI_judge_df <- read.csv("test/AI_judgments.csv")
+test_aAI_fewshot_df <- read.csv("test/AI_judgments_aligned_fewshot.csv")
+test_aAI_heuristic_df <- read.csv("test/AI_judgments_aligned_heuristic.csv")
+
+# Calculate metrics for train set
+train_wikipedia_pages <- nrow(train_intro_df)
+train_revisions <- sum(train_intro_df$intro_10 != "") + sum(train_intro_df$intro_100 != "")
+
+train_heuristic_noteworthy <- c(train_response_df$heuristic_10_noteworthy, train_response_df$heuristic_100_noteworthy)
+train_heuristic_noteworthy <- train_heuristic_noteworthy[train_heuristic_noteworthy != ""]
+train_heuristic_count <- sum(train_heuristic_noteworthy == "True")
+
+train_fewshot_noteworthy <- c(train_response_df$few.shot_10_noteworthy, train_response_df$few.shot_100_noteworthy)
+train_fewshot_noteworthy <- train_fewshot_noteworthy[train_fewshot_noteworthy != ""]
+train_fewshot_count <- sum(train_fewshot_noteworthy == "True")
+
+train_disagreements <- nrow(train_disagree_df)
+train_human_noteworthy <- sum(train_human_df$noteworthy == "True")
+train_AI_noteworthy <- sum(train_AI_judge_df$noteworthy == "True")
+train_aAI_fewshot_noteworthy <- sum(train_aAI_fewshot_df$noteworthy == "True")
+train_aAI_heuristic_noteworthy <- sum(train_aAI_heuristic_df$noteworthy == "True")
+
+# Calculate train accuracies
+stopifnot(all(train_human_df$title == train_disagree_df$title))
+train_AI_accuracy <- calc_accuracy(train_AI_judge_df$noteworthy, train_human_df$noteworthy)
+train_aAI_fewshot_accuracy <- calc_accuracy(train_aAI_fewshot_df$noteworthy, train_human_df$noteworthy)
+train_aAI_heuristic_accuracy <- calc_accuracy(train_aAI_heuristic_df$noteworthy, train_human_df$noteworthy)
+
+# Calculate metrics for test set
+test_wikipedia_pages <- nrow(test_intro_df)
+test_revisions <- sum(test_intro_df$intro_10 != "") + sum(test_intro_df$intro_100 != "")
+
+test_heuristic_noteworthy <- c(test_response_df$heuristic_10_noteworthy, test_response_df$heuristic_100_noteworthy)
+test_heuristic_noteworthy <- test_heuristic_noteworthy[test_heuristic_noteworthy != ""]
+test_heuristic_count <- sum(test_heuristic_noteworthy == "True")
+
+test_fewshot_noteworthy <- c(test_response_df$few.shot_10_noteworthy, test_response_df$few.shot_100_noteworthy)
+test_fewshot_noteworthy <- test_fewshot_noteworthy[test_fewshot_noteworthy != ""]
+test_fewshot_count <- sum(test_fewshot_noteworthy == "True")
+
+test_disagreements <- nrow(test_disagree_df)
+test_human_noteworthy <- sum(test_human_df$noteworthy == "True")
+test_AI_noteworthy <- sum(test_AI_judge_df$noteworthy == "True")
+test_aAI_fewshot_noteworthy <- sum(test_aAI_fewshot_df$noteworthy == "True")
+test_aAI_heuristic_noteworthy <- sum(test_aAI_heuristic_df$noteworthy == "True")
+
+# Calculate test accuracies
+stopifnot(all(test_human_df$title == test_disagree_df$title))
+test_AI_accuracy <- calc_accuracy(test_AI_judge_df$noteworthy, test_human_df$noteworthy)
+test_aAI_fewshot_accuracy <- calc_accuracy(test_aAI_fewshot_df$noteworthy, test_human_df$noteworthy)
+test_aAI_heuristic_accuracy <- calc_accuracy(test_aAI_heuristic_df$noteworthy, test_human_df$noteworthy)
+
+# Build markdown table
+table_rows <- character()
+
+# Helper function to format table row
+format_row <- function(label, train_samples, test_samples, train_acc = "", test_acc = "") {
+  if(train_samples == "" | test_samples == "") {
+    return(sprintf("| %s | %s | %s | %s | %s |", label, train_samples, test_samples, train_acc, test_acc))
+  }
+  train_acc_str <- ifelse(train_acc == "", "", paste0(train_acc, "%"))
+  test_acc_str <- ifelse(test_acc == "", "", paste0(test_acc, "%"))
+  sprintf("| %s | %d | %d | %s | %s |", label, train_samples, test_samples, train_acc_str, test_acc_str)
+}
+
+# Main rows
+table_rows <- c(table_rows, format_row("Wikipedia pages", train_wikipedia_pages, test_wikipedia_pages))
+table_rows <- c(table_rows, format_row("Total revisions (10 and 100 behind)", train_revisions, test_revisions))
+table_rows <- c(table_rows, format_row("Noteworthy classifications by:", "", ""))
+table_rows <- c(table_rows, format_row("&emsp;Heuristic classifier", train_heuristic_count, test_heuristic_count))
+table_rows <- c(table_rows, format_row("&emsp;Few-shot classifier", train_fewshot_count, test_fewshot_count))
+table_rows <- c(table_rows, format_row("Disagreements between classifiers", train_disagreements, test_disagreements))
+
+# Indented sub-rows
+table_rows <- c(table_rows, format_row("&emsp;Noteworthy classifications by:", "", ""))
+table_rows <- c(table_rows, format_row("&emsp;&emsp;Human annotator", train_human_noteworthy, test_human_noteworthy))
+table_rows <- c(table_rows, format_row("&emsp;&emsp;Unaligned AI judge", train_AI_noteworthy, test_AI_noteworthy, train_AI_accuracy, test_AI_accuracy))
+table_rows <- c(table_rows, format_row("&emsp;&emsp;Few-shot AI judge", train_aAI_fewshot_noteworthy, test_aAI_fewshot_noteworthy, train_aAI_fewshot_accuracy, test_aAI_fewshot_accuracy))
+table_rows <- c(table_rows, format_row("&emsp;&emsp;Heuristic AI judge", train_aAI_heuristic_noteworthy, test_aAI_heuristic_noteworthy, train_aAI_heuristic_accuracy, test_aAI_heuristic_accuracy))
+
+# Create full markdown table
+header <- "| | Train samples | Test samples | Train accuracy | Test accuracy |"
+separator <- "| --- | --- | --- | --- | --- |"
+output <- c(header, separator, table_rows)
+
+# Print output
+cat(paste(output, collapse = "\n"), sep = "\n")
