@@ -5,7 +5,7 @@ from models import judge
 if __name__ == "__main__":
 
     """
-    Run the judge on all rows from 'data/disagreements_for_AI.csv' and save results in 'data/AI_judgments.csv'.
+    Run the judge on all rows from 'data/disagreements_for_AI.csv' and save results in 'data/AI_judgments_unaligned.csv'.
     """
 
     # Read the data
@@ -17,17 +17,17 @@ if __name__ == "__main__":
 
     # We run the unaligned judge unless the script is called with --aligned-fewshot or --aligned--heuristic
     mode = "unaligned"
-    outfile = "data/AI_judgments.csv"
+    outfile = "data/AI_judgments_unaligned.csv"
     # Check if an argument was passed
     if len(sys.argv) > 1:
         # sys.argv[0] is the script name, sys.argv[1] is the first argument
         argument = sys.argv[1]
         if argument == "--aligned-fewshot":
             mode = "aligned-fewshot"
-            outfile = "data/AI_judgments_aligned_fewshot.csv"
+            outfile = "data/AI_judgments_fewshot.csv"
         elif argument == "--aligned-heuristic":
             mode = "aligned-heuristic"
-            outfile = "data/AI_judgments_aligned_heuristic.csv"
+            outfile = "data/AI_judgments_heuristic.csv"
         else:
             raise ValueError(f"Unknown argument: {argument}")
 
