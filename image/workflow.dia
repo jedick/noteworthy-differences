@@ -5256,7 +5256,7 @@ revisions#</dia:string>
         <dia:point val="69.1721,7.79009"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="68.8052,6.59146;69.5288,7.84063"/>
+        <dia:rectangle val="68.8354,6.59146;69.4972,7.84063"/>
       </dia:attribute>
       <dia:attribute name="conn_endpoints">
         <dia:point val="69.1721,7.79009"/>
@@ -5266,7 +5266,7 @@ revisions#</dia:string>
         <dia:int val="1"/>
       </dia:attribute>
       <dia:attribute name="end_arrow">
-        <dia:enum val="22"/>
+        <dia:enum val="1"/>
       </dia:attribute>
       <dia:attribute name="end_arrow_length">
         <dia:real val="0.5"/>
