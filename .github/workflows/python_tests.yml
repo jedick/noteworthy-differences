@@ -18,4 +18,5 @@ jobs:
       run: |
         pip install pytest
         pytest test_models.py --junitxml=junit/test-results.xml
-
+      env:
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
