@@ -4,3 +4,5 @@ pandas
 dotenv
 gradio
 requests
+logfire
+opentelemetry-instrumentation-google-genai

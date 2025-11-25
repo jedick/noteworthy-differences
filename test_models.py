@@ -1,23 +1,40 @@
 from models import classifier, judge
+from dotenv import load_dotenv
+import logfire
 
 
-def classifier_logic():
-    """Return scenario flags for heuristic/few-shot classifier outputs."""
+# Loads API keys
+load_dotenv(dotenv_path=".env", override=True)
+# Setup Logfire
+# We need send_to_logfire=True to capture traces under Pytest
+# https://logfire.pydantic.dev/docs/reference/advanced/testing/
+logfire.configure(send_to_logfire=True)
+
+
+def classifier_logic(i):
+    """
+    Return scenario flags for heuristic/few-shot classifier outputs.
+
+    Args:
+        i: Current iteration (for logging)
+
+    """
 
     old_revision = """Henry Purcell (/ˈpɜːrsəl/, rare: /pərˈsɛl/;[n 1] c. 10 September 1659[n 2] – 21 November 1695) was an English composer of Baroque music.  He composed more than 100 songs, a tragic opera Dido and Aeneas, and wrote incidental music to a version of Shakespeare's A Midsummer Night's Dream called The Fairy Queen."""
 
     new_revision = """Henry Purcell (/ˈpɜːrsəl/, rare: /pərˈsɛl/;[n 1] c. 10 September 1659[n 2] – 21 November 1695) was an English composer and organist of the middle Baroque era.  He composed more than 100 songs, a tragic opera Dido and Aeneas, and wrote incidental music to a version of Shakespeare's A Midsummer Night's Dream called The Fairy Queen."""
 
-    # Run classifier models
-    heuristic = classifier(old_revision, new_revision, "heuristic")
-    few_shot = classifier(old_revision, new_revision, "few-shot")
-    heuristic_true = heuristic["noteworthy"] is True
-    few_shot_true = few_shot["noteworthy"] is True
+    with logfire.span("classifier_logic {i}", i=i):
+        # Run classifier models
+        heuristic = classifier(old_revision, new_revision, "heuristic")
+        few_shot = classifier(old_revision, new_revision, "few-shot")
+        heuristic_true = heuristic["noteworthy"] is True
+        few_shot_true = few_shot["noteworthy"] is True
 
-    only_heuristic_true = heuristic_true and not few_shot_true
-    only_few_shot_true = few_shot_true and not heuristic_true
-    both_true = heuristic_true and few_shot_true
-    both_false = (heuristic_true is False) and (few_shot_true is False)
+        only_heuristic_true = heuristic_true and not few_shot_true
+        only_few_shot_true = few_shot_true and not heuristic_true
+        both_true = heuristic_true and few_shot_true
+        both_false = (heuristic_true is False) and (few_shot_true is False)
 
     return (
         only_heuristic_true,
@@ -27,28 +44,36 @@ def classifier_logic():
     )
 
 
-def judge_logic():
+def judge_logic(i):
+    """
+    Return scenario flags for judge outputs.
+
+    Args:
+        i: Current iteration (for logging)
+
+    """
 
     old_revision = """Kaman-Kalehöyük Archaeological Museum (Turkish: Kaman-Kalehöyük Arkeoloji Müzesi) is an archaeological museum in Kaman District of Kırşehir Province in Turkey. It exhibits artifacts of seven civilizations excavated in the nearby multi-period mound Kaman-Kalehöyük. It was opened in 2010. A Japanese garden is next to the museum building.[1][2]"""
 
     new_revision = """The Kaman-Kalehöyük Archaeological Museum (Turkish: Kaman-Kalehöyük Arkeoloji Müzesi) is an archaeological museum in Çağırkan, Kaman District, Kırşehir Province, Turkey. It exhibits artifacts of seven civilizations excavated in the nearby multi-period mound Kaman-Kalehöyük. It opened in 2010. A Japanese garden is next to the museum building.[1][2]"""
 
-    heuristic = classifier(old_revision, new_revision, "heuristic")
-    few_shot = classifier(old_revision, new_revision, "few-shot")
-    judge_few_shot = judge(
-        old_revision,
-        new_revision,
-        heuristic["rationale"],
-        few_shot["rationale"],
-        mode="aligned-fewshot",
-    )
-    judge_heuristic = judge(
-        old_revision,
-        new_revision,
-        heuristic["rationale"],
-        few_shot["rationale"],
-        mode="aligned-heuristic",
-    )
+    with logfire.span("judge_logic {i}", i=i):
+        heuristic = classifier(old_revision, new_revision, "heuristic")
+        few_shot = classifier(old_revision, new_revision, "few-shot")
+        judge_few_shot = judge(
+            old_revision,
+            new_revision,
+            heuristic["rationale"],
+            few_shot["rationale"],
+            mode="aligned-fewshot",
+        )
+        judge_heuristic = judge(
+            old_revision,
+            new_revision,
+            heuristic["rationale"],
+            few_shot["rationale"],
+            mode="aligned-heuristic",
+        )
 
     # Test condition is True if aligned judges both give False
     judge_condition = (
@@ -62,7 +87,8 @@ def judge_logic():
 def test_classifier():
     """Run classifier logic exactly 5 times and compare outcomes."""
     tries = 5
-    outcomes = [classifier_logic() for _ in range(tries)]
+    with logfire.span("test_classifier"):
+        outcomes = [classifier_logic(i) for i in range(tries)]
 
     only_heuristic_true = sum(result[0] for result in outcomes)
     only_few_shot_true = sum(result[1] for result in outcomes)
@@ -92,13 +118,14 @@ def test_judge():
     """Run judge logic up to 5 times"""
     current_try = 0
     max_trys = 5
-    while current_try < max_trys:
-        current_try += 1
-        result = judge_logic()
-        if result is True:
-            print(f"Try {current_try} succeeded")
-            break
-        else:
-            print(f"Try {current_try} failed")
+    with logfire.span("test_judge"):
+        while current_try < max_trys:
+            result = judge_logic(current_try)
+            current_try += 1
+            if result is True:
+                print(f"Try {current_try} succeeded")
+                break
+            else:
+                print(f"Try {current_try} failed")
     # The assert for pytest
     assert result is True

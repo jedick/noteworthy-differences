@@ -11,9 +11,16 @@ import os
 import pandas as pd
 from prompts import analyzer_prompts, judge_prompt
 from retry_with_backoff import retry_with_backoff
+import logfire
 
-# Loads GEMINI_API_KEY
+# Loads API keys
 load_dotenv(dotenv_path=".env", override=True)
+
+# Setup Logfire
+logfire.configure()
+
+# This wraps Google Gen AI client calls so Logfire captures prompts, responses, and metadata
+logfire.instrument_google_genai()
 
 # Initialize the Gemini LLM
 client = genai.Client()
@@ -51,14 +58,15 @@ def classifier(old_revision, new_revision, prompt_style):
         rationale: str
 
     # Generate response
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=Response.model_json_schema(),
-        ),
-    )
+    with logfire.span("classifier"):
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=Response.model_json_schema(),
+            ),
+        )
 
     return json.loads(response.text)
 
@@ -112,13 +120,14 @@ def judge(old_revision, new_revision, rationale_1, rationale_2, mode="unaligned"
         reasoning: str
 
     # Generate response
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=Response.model_json_schema(),
-        ),
-    )
+    with logfire.span("judge"):
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=Response.model_json_schema(),
+            ),
+        )
 
     return json.loads(response.text)

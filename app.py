@@ -8,8 +8,21 @@ from wiki_data_fetcher import (
     get_random_wikipedia_title,
 )
 from models import classifier, judge
+import logfire
+from dotenv import load_dotenv
+
+# Loads API keys
+load_dotenv(dotenv_path=".env", override=True)
+# Setup logging with Logfire
+logfire.configure()
+
+# If running a standalone Gradio app via `demo.launch()` within a script,
+# Logfire's auto-instrumentation for FastAPI is often automatically handled
+# if installed. If mounting within a separate FastAPI app, use:
+# logfire.instrument_fastapi(app)
 
 
+@logfire.instrument("Step 1: Fetch current revision")
 def fetch_current_revision(title: str):
     """
     Fetch current revision of a Wikipedia article and return its introduction.
@@ -56,6 +69,7 @@ def fetch_current_revision(title: str):
         return None, None
 
 
+@logfire.instrument("Step 2: Fetch previous revision")
 def fetch_previous_revision(title: str, unit: str, number: int, new_revision: str):
     """
     Fetch previous revision of a Wikipedia article and return its introduction.
@@ -89,7 +103,6 @@ def fetch_previous_revision(title: str, unit: str, number: int, new_revision: st
 
         revid = revision_info["revid"]
         timestamp = revision_info["timestamp"]
-        print(f"revid for old revision: {revid}")
 
         # Get introduction
         introduction = get_wikipedia_introduction(revid)
@@ -122,6 +135,7 @@ def fetch_previous_revision(title: str, unit: str, number: int, new_revision: st
         return None, None
 
 
+@logfire.instrument("Step 3: Run classifier")
 def run_classifier(old_revision: str, new_revision: str, prompt_style: str):
     """
     Run a classification model on the revisions.
@@ -157,14 +171,17 @@ def run_classifier(old_revision: str, new_revision: str, prompt_style: str):
     return noteworthy, rationale
 
 
+@logfire.instrument("Step 3a: Run heuristic classifier")
 def run_heuristic_classifier(old_revision: str, new_revision: str):
     return run_classifier(old_revision, new_revision, prompt_style="heuristic")
 
 
+@logfire.instrument("Step 3b: Run few-shot classifier")
 def run_fewshot_classifier(old_revision: str, new_revision: str):
     return run_classifier(old_revision, new_revision, prompt_style="few-shot")
 
 
+@logfire.instrument("Step 4: Run judge")
 def run_judge(
     old_revision: str,
     new_revision: str,
@@ -296,7 +313,7 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
             label="Judge Mode",
         )
         with gr.Column():
-            random_btn = gr.Button("Get Random Page Title", variant="primary")
+            random_btn = gr.Button("Get Random Page Title")
             submit_btn = gr.Button("Fetch Revisions and Run Model", variant="primary")
 
     with gr.Row():
