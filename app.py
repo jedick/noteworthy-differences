@@ -180,73 +180,6 @@ def run_fewshot_classifier(old_revision: str, new_revision: str):
     return run_classifier(old_revision, new_revision, prompt_style="few-shot")
 
 
-@logfire.instrument("Step 4: Run judge")
-def run_judge(
-    old_revision: str,
-    new_revision: str,
-    heuristic_rationale,
-    fewshot_rationale,
-    judge_mode: str,
-):
-    """
-    Run classification models and judge on the revisions.
-
-    Args:
-        old_revision: Old revision text
-        new_revision: New revision text
-        heuristic_rationale: Heuristic model's rationale
-        fewshot_rationale: Few-shot model's rationale
-        judge_mode: Mode for judge function ("unaligned", "aligned-fewshot", "aligned-heuristic")
-
-    Returns:
-        Tuple of (noteworthy, reasoning) (bool, str)
-    """
-
-    # Values to return if there is an error
-    noteworthy, reasoning = None, None
-    if (
-        not old_revision
-        or not new_revision
-        or not heuristic_rationale
-        or not fewshot_rationale
-    ):
-        return noteworthy, reasoning
-
-    try:
-        # Run judge
-        result = judge(
-            old_revision,
-            new_revision,
-            heuristic_rationale,
-            fewshot_rationale,
-            mode=judge_mode,
-        )
-        if result:
-            noteworthy = result.get("noteworthy", "")
-            reasoning = result.get("reasoning", "")
-        else:
-            error_msg = f"Error: Could not get judge's result"
-            raise gr.Error(error_msg, print_exception=False)
-
-    except Exception as e:
-        error_msg = f"Error running judge: {str(e)}"
-        raise gr.Error(error_msg, print_exception=False)
-
-    return noteworthy, reasoning
-
-
-def format_noteworthy(noteworthy, reasoning):
-    """
-    Format judge's noteworthy label as text.
-    """
-    if not reasoning:
-        # If the reasoning is empty, return nothing
-        return None
-    else:
-        # Format noteworthy boolean as text
-        return str(noteworthy)
-
-
 def compute_confidence(
     heuristic_noteworthy,
     fewshot_noteworthy,
@@ -272,12 +205,81 @@ def compute_confidence(
         return "Questionable"
 
 
-# Setup theme without background image
-theme = gr.Theme.from_hub("NoCrypt/miku")
-theme.set(body_background_fill="#FFFFFF", body_background_fill_dark="#000000")
+@logfire.instrument("Step 4: Run judge")
+def run_judge(
+    old_revision: str,
+    new_revision: str,
+    heuristic_noteworthy: bool,
+    fewshot_noteworthy: bool,
+    heuristic_rationale: str,
+    fewshot_rationale: str,
+    judge_mode: str,
+):
+    """
+    Run judge on the revisions and classifiers' rationales.
+
+    Args:
+        old_revision: Old revision text
+        new_revision: New revision text
+        heuristic_rationale: Heuristic model's rationale
+        fewshot_rationale: Few-shot model's rationale
+        judge_mode: Mode for judge function ("unaligned", "aligned-fewshot", "aligned-heuristic")
+
+    Returns:
+        Tuple of (noteworthy, noteworthy_text, reasoning, confidence) (bool, str, str, str)
+    """
+
+    # Values to return if there is an error
+    noteworthy, noteworthy_text, reasoning, confidence = None, None, None, None
+    if (
+        not old_revision
+        or not new_revision
+        or not heuristic_rationale
+        or not fewshot_rationale
+    ):
+        return noteworthy, noteworthy_text, reasoning, confidence
+
+    try:
+        # Run judge
+        result = judge(
+            old_revision,
+            new_revision,
+            heuristic_rationale,
+            fewshot_rationale,
+            mode=judge_mode,
+        )
+        if result:
+            noteworthy = result.get("noteworthy", "")
+            reasoning = result.get("reasoning", "")
+        else:
+            error_msg = f"Error: Could not get judge's result"
+            raise gr.Error(error_msg, print_exception=False)
+
+    except Exception as e:
+        error_msg = f"Error running judge: {str(e)}"
+        raise gr.Error(error_msg, print_exception=False)
+
+    # Format noteworthy label (boolean) as text
+    if not reasoning:
+        noteworthy_text = None
+    else:
+        noteworthy_text = str(noteworthy)
+
+    # Get confidence score
+    confidence = compute_confidence(
+        heuristic_noteworthy,
+        fewshot_noteworthy,
+        noteworthy,
+        heuristic_rationale,
+        fewshot_rationale,
+        reasoning,
+    )
+
+    return noteworthy, noteworthy_text, reasoning, confidence
+
 
 # Create Gradio interface
-with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
+with gr.Blocks(title="Noteworthy Differences") as demo:
     with gr.Row():
         with gr.Column(scale=2):
             gr.Markdown(
@@ -360,12 +362,12 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
                     lines=1,
                     interactive=False,
                 )
-            rerun_btn = gr.Button("Rerun Model", variant="primary")
+            rerun_btn = gr.Button("Rerun Model")
 
-    # Hidden checkboxes to store boolean values
-    heuristic_noteworthy = gr.Checkbox(visible=False)
-    fewshot_noteworthy = gr.Checkbox(visible=False)
-    judge_noteworthy = gr.Checkbox(visible=False)
+    # States to store boolean values
+    heuristic_noteworthy = gr.State()
+    fewshot_noteworthy = gr.State()
+    judge_noteworthy = gr.State()
 
     random_btn.click(
         fn=get_random_wikipedia_title,
@@ -407,28 +409,13 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
         inputs=[
             old_revision,
             new_revision,
+            heuristic_noteworthy,
+            fewshot_noteworthy,
             heuristic_rationale,
             fewshot_rationale,
             judge_mode_dropdown,
         ],
-        outputs=[judge_noteworthy, judge_reasoning],
-        api_name=False,
-    ).then(
-        fn=format_noteworthy,
-        inputs=[judge_noteworthy, judge_reasoning],
-        outputs=[noteworthy_text],
-        api_name=False,
-    ).then(
-        fn=compute_confidence,
-        inputs=[
-            heuristic_noteworthy,
-            fewshot_noteworthy,
-            judge_noteworthy,
-            heuristic_rationale,
-            fewshot_rationale,
-            judge_reasoning,
-        ],
-        outputs=[confidence],
+        outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence],
         api_name=False,
     )
 
@@ -449,30 +436,20 @@ with gr.Blocks(theme=theme, title="Noteworthy Differences") as demo:
         inputs=[
             old_revision,
             new_revision,
+            heuristic_noteworthy,
+            fewshot_noteworthy,
             heuristic_rationale,
             fewshot_rationale,
             judge_mode_dropdown,
         ],
-        outputs=[judge_noteworthy, judge_reasoning],
-        api_name=False,
-    ).then(
-        fn=format_noteworthy,
-        inputs=[judge_noteworthy, judge_reasoning],
-        outputs=[noteworthy_text],
-        api_name=False,
-    ).then(
-        fn=compute_confidence,
-        inputs=[
-            heuristic_noteworthy,
-            fewshot_noteworthy,
-            judge_noteworthy,
-            heuristic_rationale,
-            fewshot_rationale,
-            judge_reasoning,
-        ],
-        outputs=[confidence],
+        outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence],
         api_name=False,
     )
 
 if __name__ == "__main__":
-    demo.launch()
+
+    # Setup theme without background image
+    theme = gr.Theme.from_hub("NoCrypt/miku")
+    theme.set(body_background_fill="#FFFFFF", body_background_fill_dark="#000000")
+
+    demo.launch(theme=theme)
