@@ -281,24 +281,14 @@ def run_judge(
 # Create Gradio interface
 with gr.Blocks(title="Noteworthy Differences") as demo:
     with gr.Row():
-        with gr.Column(scale=2):
-            gr.Markdown(
-                """
-            # Noteworthy Differences
-            Compare the current revision of a Wikipedia article (introduction only) with an old revision (number of days or revisions behind).<br>
-            Two classifier models, with relatively short heuristic and few-shot prompts, and a judge predict the noteworthiness of the differences.<br>
-            The judge has a longer prompt for AI alignment, also in heuristic or few-shot styles, produced as described in the
-            [GitHub repository](https://github.com/jedick/noteworthy-differences).
+        gr.Markdown(
             """
-            )
-        with gr.Column(scale=1):
-            gr.Markdown(
-                """#### Confidence Key
-                - **High:** heuristic = few-shot = judge
-                - **Moderate:** heuristic ≠ few-shot, judge decides
-                - **Questionable:** heuristic = few-shot, judge vetoes
-                """
-            )
+        Compare current and old revisions of a Wikipedia article - you choose the number of days or revisions behind.<br>
+        Two classifier models (with heuristic and few-shot prompts) and a judge predict the noteworthiness of the differences.<br>
+        The judge was aligned with human preferences as described in the
+        [GitHub repository](https://github.com/jedick/noteworthy-differences).
+        """
+        )
 
     with gr.Row():
         title_input = gr.Textbox(
@@ -323,9 +313,10 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             old_timestamp = gr.Markdown("")
             old_revision = gr.Textbox(label="", lines=15, max_lines=30, container=False)
             gr.Markdown(
-                """
-            - Page title is case-sensitive; use underscores or spaces.
-            - Specify any number of days or up to 499 revisions behind.
+                """#### Query Instructions
+            - Page title is case sensitive; use underscores or spaces
+            - Specify any number of days or up to 499 revisions behind
+            - Only article introductions are downloaded
             """
             )
 
@@ -333,6 +324,13 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             gr.Markdown("### Current Revision")
             new_timestamp = gr.Markdown("")
             new_revision = gr.Textbox(label="", lines=15, max_lines=30, container=False)
+            gr.Markdown(
+                """#### Confidence Key
+                - **High:** heuristic = few-shot, judge agrees
+                - **Moderate:** heuristic ≠ few-shot, judge decides
+                - **Questionable:** heuristic = few-shot, judge vetoes
+                """
+            )
 
         with gr.Column():
             gr.Markdown("### Model Output")
