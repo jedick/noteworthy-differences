@@ -17,6 +17,8 @@ jobs:
     - name: Test with pytest
       run: |
         pip install pytest
-        pytest test_models.py --junitxml=junit/test-results.xml
+        pytest test_models.py
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        LOGFIRE_TOKEN: ${{ secrets.LOGFIRE_TOKEN }}
+        OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT: 'true'
