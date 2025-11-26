@@ -3,8 +3,8 @@ from dotenv import load_dotenv
 import logfire
 
 
-# Loads API keys
-load_dotenv(dotenv_path=".env", override=True)
+# Load API keys
+load_dotenv()
 # Setup Logfire
 # We need send_to_logfire=True to capture traces under Pytest
 # https://logfire.pydantic.dev/docs/reference/advanced/testing/
@@ -85,7 +85,7 @@ def judge_logic(i):
 
 # pytest -vv test_models.py::test_classifier
 def test_classifier():
-    """Run classifier logic exactly 5 times and compare outcomes."""
+    """Run classifier logic 5 times and compare outcomes."""
     tries = 5
     with logfire.span("test_classifier"):
         outcomes = [classifier_logic(i) for i in range(tries)]

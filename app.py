@@ -11,8 +11,8 @@ from models import classifier, judge
 import logfire
 from dotenv import load_dotenv
 
-# Loads API keys
-load_dotenv(dotenv_path=".env", override=True)
+# Load API keys
+load_dotenv()
 # Setup logging with Logfire
 logfire.configure()
 
@@ -135,7 +135,6 @@ def fetch_previous_revision(title: str, unit: str, number: int, new_revision: st
         return None, None
 
 
-@logfire.instrument("Step 3: Run classifier")
 def run_classifier(old_revision: str, new_revision: str, prompt_style: str):
     """
     Run a classification model on the revisions.
