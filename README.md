@@ -1,8 +1,15 @@
 # Noteworthy Differences
 
+[![Open in HF Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-sm.svg)](https://huggingface.co/spaces/jedick/noteworthy-differences)
+
 Noteworthy differences are important in many situations.
-For example, a product's description is frequently updated but you only want notifications for big changes.
+For example, project documents are frequently updated but you only want notifications for big changes.
 A goal of alignment is to train AI systems to detect changes that humans think are noteworthy.
+
+<div align="center">
+  <img src="image/headline-image.png" alt="Different-sized vertical lines represent frequent updates; bells above the longest lines represent notifications only for big changes" style="width:40%;"/>
+</div>
+
 
 This project implements an AI alignment pipeline with a two-stage architecture (classifiers and judge).
 The provides not only a label with reasoning but also a confidence estimate.
