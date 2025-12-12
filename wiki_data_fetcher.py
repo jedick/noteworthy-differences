@@ -27,12 +27,12 @@ def run_get_request(params: dict):
     return json_data
 
 
-def extract_revision_info(json_data, revision=0):
+def extract_revision_info(json_data, revnum=0, limit_revnum=True):
     """
     Utility function to extract page revision info from JSON data returned from API call
 
     Args:
-        revision: revision before current
+        revnum: revision before current
 
     Examples:
         title = 'David_Szalay'
@@ -45,25 +45,20 @@ def extract_revision_info(json_data, revision=0):
     pages = json_data["query"]["pages"]
     page_id = list(pages.keys())[0]
 
-    if page_id == "-1":
-        # Page not found, return empty dict
-        return {"revid": None, "timestamp": None}
-
     try:
+        if limit_revnum:
+            # Limit revnum to earliest available revision before current
+            revnum = min([revnum, len(pages[page_id]["revisions"]) - 1])
         # Get the specified revision
-        revision = pages[page_id]["revisions"][revision]
-        revid = revision["revid"]
-        timestamp = revision["timestamp"]
+        revision = pages[page_id]["revisions"][revnum]
+        # Remove the parentid key because we don't use it
+        _ = revision.pop("parentid", None)
+        # Add the actual revision number
+        revision["revnum"] = revnum
+        return revision
     except:
-        # Revision not found, return empty dict
-        return {"revid": None, "timestamp": None}
-
-    # NOTUSED: Create permanent URL
-    # permanent_url = f"https://en.wikipedia.org/w/index.php?title={title}&oldid={revid}"
-
-    # Remove the parentid key because we don't use it
-    _ = revision.pop("parentid", None)
-    return revision
+        # Page or revision not found, return empty dict
+        return {"revid": None, "timestamp": None, "revnum": None}
 
 
 def get_revision_from_age(title: str, age_days: int = 0) -> Dict[str, str]:

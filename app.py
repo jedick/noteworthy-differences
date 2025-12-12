@@ -41,7 +41,7 @@ def fetch_current_revision(title: str):
     try:
         # Get current revision (revision 0)
         json_data = get_previous_revisions(title, revisions=0)
-        revision_info = extract_revision_info(json_data, revision=0)
+        revision_info = extract_revision_info(json_data, revnum=0)
 
         if not revision_info.get("revid"):
             error_msg = f"Error: Could not find Wikipedia page '{title}'. Please check the title."
@@ -76,8 +76,8 @@ def fetch_previous_revision(title: str, unit: str, number: int, new_revision: st
 
     Args:
         title: Wikipedia article title
-        unit: "days" or "revisions"
-        number: Number of days or revisions behind
+        unit: "revisions" or "days"
+        number: Number of revisions or days behind
 
     Returns:
         Tuple of (introduction, timestamp)
@@ -92,7 +92,7 @@ def fetch_previous_revision(title: str, unit: str, number: int, new_revision: st
         # Get previous revision based on unit
         if unit == "revisions":
             json_data = get_previous_revisions(title, revisions=number)
-            revision_info = extract_revision_info(json_data, revision=number)
+            revision_info = extract_revision_info(json_data, revnum=number)
         else:  # unit == "days"
             revision_info = get_revision_from_age(title, age_days=number)
 
@@ -112,7 +112,7 @@ def fetch_previous_revision(title: str, unit: str, number: int, new_revision: st
 
         # Get revisions_behind
         if unit == "revisions":
-            revisions_behind = number
+            revisions_behind = revision_info["revnum"]
         else:
             revisions_behind = get_revisions_behind(title, revid)
             # For a negative number, replace the negative sign with ">"
@@ -283,7 +283,7 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
     with gr.Row():
         gr.Markdown(
             """
-        Compare current and old revisions of a Wikipedia article - you choose the number of days or revisions behind.<br>
+        Compare current and old revisions of a Wikipedia article - you choose the number of revisions or days behind.<br>
         Two classifier models (with heuristic and few-shot prompts) and a judge predict the noteworthiness of the differences.<br>
         The judge was aligned with human preferences as described in the
         [GitHub repository](https://github.com/jedick/noteworthy-differences).
@@ -294,9 +294,9 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
         title_input = gr.Textbox(
             label="Wikipedia Page Title", placeholder="e.g., Albert Einstein", value=""
         )
-        number_input = gr.Number(label="Number", value=100, minimum=0, precision=0)
+        number_input = gr.Number(label="Number", value=50, minimum=0, precision=0)
         unit_dropdown = gr.Dropdown(
-            choices=["days", "revisions"], value="days", label="Unit"
+            choices=["revisions", "days"], value="revisions", label="Unit"
         )
         judge_mode_dropdown = gr.Dropdown(
             choices=["unaligned", "aligned-fewshot", "aligned-heuristic"],
@@ -316,6 +316,7 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
                 """#### Query Instructions
             - Page title is case sensitive; use underscores or spaces
             - Specify any number of days or up to 499 revisions behind
+              - The closest available revision is retrieved
             - Only article introductions are downloaded
             """
             )

@@ -31,12 +31,12 @@ if __name__ == "__main__":
             ts_0.append(info_0["timestamp"])
             intro_0.append(get_wikipedia_introduction(info_0["revid"]))
             # Append data for 10th revision before current
-            info_10 = extract_revision_info(json_data, 10)
+            info_10 = extract_revision_info(json_data, 10, limit_revnum=False)
             revid_10.append(info_10["revid"])
             ts_10.append(info_10["timestamp"])
             intro_10.append(get_wikipedia_introduction(info_10["revid"]))
             # Append data for 100th revision before current
-            info_100 = extract_revision_info(json_data, 100)
+            info_100 = extract_revision_info(json_data, 100, limit_revnum=False)
             revid_100.append(info_100["revid"])
             ts_100.append(info_100["timestamp"])
             intro_100.append(get_wikipedia_introduction(info_100["revid"]))
