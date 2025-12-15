@@ -10,20 +10,37 @@ from wiki_data_fetcher import (
 from models import classifier, judge
 import logfire
 from dotenv import load_dotenv
+from contextlib import nullcontext
 
 # Load API keys
 load_dotenv()
 # Setup logging with Logfire
 logfire.configure()
 
-# If running a standalone Gradio app via `demo.launch()` within a script,
-# Logfire's auto-instrumentation for FastAPI is often automatically handled
-# if installed. If mounting within a separate FastAPI app, use:
-# logfire.instrument_fastapi(app)
+
+def start_parent_span(title: str, number: int, units: str):
+    """
+    Start a parent span and return the context for propagation to children.
+    See https://logfire.pydantic.dev/docs/how-to-guides/distributed-tracing/#manual-context-propagation
+    """
+    span_name = f"{title} - {number} {units}"
+    with logfire.span(span_name) as span:
+        span.__enter__()
+        context = logfire.get_context()
+    return context
 
 
-@logfire.instrument("Step 1: Fetch current revision")
-def fetch_current_revision(title: str):
+def fetch_current_revision(title: str, context=None):
+    """
+    Wrapper to run _fetch_current_revision in provided Logfire context.
+    We use this to minimize indentation in the wrapped function.
+    """
+    with logfire.attach_context(context) if context else nullcontext():
+        return _fetch_current_revision(title)
+
+
+@logfire.instrument("Fetch current revision")
+def _fetch_current_revision(title: str):
     """
     Fetch current revision of a Wikipedia article and return its introduction.
 
@@ -69,15 +86,22 @@ def fetch_current_revision(title: str):
         return None, None
 
 
-@logfire.instrument("Step 2: Fetch previous revision")
-def fetch_previous_revision(title: str, unit: str, number: int, new_revision: str):
+def fetch_previous_revision(
+    title: str, number: int, units: str, new_revision: str, context=None
+):
+    with logfire.attach_context(context) if context else nullcontext():
+        return _fetch_previous_revision(title, number, units, new_revision)
+
+
+@logfire.instrument("Fetch previous revision")
+def _fetch_previous_revision(title: str, number: int, units: str, new_revision: str):
     """
     Fetch previous revision of a Wikipedia article and return its introduction.
 
     Args:
         title: Wikipedia article title
-        unit: "revisions" or "days"
         number: Number of revisions or days behind
+        units: "revisions" or "days"
 
     Returns:
         Tuple of (introduction, timestamp)
@@ -89,15 +113,15 @@ def fetch_previous_revision(title: str, unit: str, number: int, new_revision: st
         return None, None
 
     try:
-        # Get previous revision based on unit
-        if unit == "revisions":
+        # Get previous revision based on units
+        if units == "revisions":
             json_data = get_previous_revisions(title, revisions=number)
             revision_info = extract_revision_info(json_data, revnum=number)
-        else:  # unit == "days"
+        else:  # units == "days"
             revision_info = get_revision_from_age(title, age_days=number)
 
         if not revision_info.get("revid"):
-            error_msg = f"Error: Could not find revision {number} {'revisions' if unit == 'revisions' else 'days'} behind for '{title}'."
+            error_msg = f"Error: Could not find revision {number} {'revisions' if units == 'revisions' else 'days'} behind for '{title}'."
             raise gr.Error(error_msg, print_exception=False)
             return None, None
 
@@ -111,7 +135,7 @@ def fetch_previous_revision(title: str, unit: str, number: int, new_revision: st
             introduction = f"Error: Could not retrieve introduction for previous revision (revid: {revid})"
 
         # Get revisions_behind
-        if unit == "revisions":
+        if units == "revisions":
             revisions_behind = revision_info["revnum"]
         else:
             revisions_behind = get_revisions_behind(title, revid)
@@ -170,13 +194,23 @@ def run_classifier(old_revision: str, new_revision: str, prompt_style: str):
     return noteworthy, rationale
 
 
-@logfire.instrument("Step 3a: Run heuristic classifier")
-def run_heuristic_classifier(old_revision: str, new_revision: str):
+def run_heuristic_classifier(old_revision: str, new_revision: str, context=None):
+    with logfire.attach_context(context) if context else nullcontext():
+        return _run_heuristic_classifier(old_revision, new_revision)
+
+
+@logfire.instrument("Run heuristic classifier")
+def _run_heuristic_classifier(old_revision: str, new_revision: str):
     return run_classifier(old_revision, new_revision, prompt_style="heuristic")
 
 
-@logfire.instrument("Step 3b: Run few-shot classifier")
-def run_fewshot_classifier(old_revision: str, new_revision: str):
+def run_fewshot_classifier(old_revision: str, new_revision: str, context=None):
+    with logfire.attach_context(context) if context else nullcontext():
+        return _run_fewshot_classifier(old_revision, new_revision)
+
+
+@logfire.instrument("Run few-shot classifier")
+def _run_fewshot_classifier(old_revision: str, new_revision: str):
     return run_classifier(old_revision, new_revision, prompt_style="few-shot")
 
 
@@ -205,8 +239,30 @@ def compute_confidence(
         return "Questionable"
 
 
-@logfire.instrument("Step 4: Run judge")
 def run_judge(
+    old_revision: str,
+    new_revision: str,
+    heuristic_noteworthy: bool,
+    fewshot_noteworthy: bool,
+    heuristic_rationale: str,
+    fewshot_rationale: str,
+    judge_mode: str,
+    context=None,
+):
+    with logfire.attach_context(context) if context else nullcontext():
+        return _run_judge(
+            old_revision,
+            new_revision,
+            heuristic_noteworthy,
+            heuristic_noteworthy,
+            heuristic_rationale,
+            fewshot_rationale,
+            judge_mode,
+        )
+
+
+@logfire.instrument("Run judge")
+def _run_judge(
     old_revision: str,
     new_revision: str,
     heuristic_noteworthy: bool,
@@ -295,7 +351,7 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             label="Wikipedia Page Title", placeholder="e.g., Albert Einstein", value=""
         )
         number_input = gr.Number(label="Number", value=50, minimum=0, precision=0)
-        unit_dropdown = gr.Dropdown(
+        units_dropdown = gr.Dropdown(
             choices=["revisions", "days"], value="revisions", label="Unit"
         )
         judge_mode_dropdown = gr.Dropdown(
@@ -367,6 +423,8 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
     heuristic_noteworthy = gr.State()
     fewshot_noteworthy = gr.State()
     judge_noteworthy = gr.State()
+    # State to store Logfire context
+    context = gr.State()
 
     random_btn.click(
         fn=get_random_wikipedia_title,
@@ -384,23 +442,28 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
         outputs=[new_revision, new_timestamp],
         api_name=False,
     ).then(
+        # Initialize Logfire context
+        fn=start_parent_span,
+        inputs=[title_input, number_input, units_dropdown],
+        outputs=context,
+    ).then(
         fn=fetch_current_revision,
-        inputs=[title_input],
+        inputs=[title_input, context],
         outputs=[new_revision, new_timestamp],
         api_name=False,
     ).then(
         fn=fetch_previous_revision,
-        inputs=[title_input, unit_dropdown, number_input, new_revision],
+        inputs=[title_input, number_input, units_dropdown, new_revision, context],
         outputs=[old_revision, old_timestamp],
         api_name=False,
     ).then(
         fn=run_heuristic_classifier,
-        inputs=[old_revision, new_revision],
+        inputs=[old_revision, new_revision, context],
         outputs=[heuristic_noteworthy, heuristic_rationale],
         api_name=False,
     ).then(
         fn=run_fewshot_classifier,
-        inputs=[old_revision, new_revision],
+        inputs=[old_revision, new_revision, context],
         outputs=[fewshot_noteworthy, fewshot_rationale],
         api_name=False,
     ).then(
@@ -413,6 +476,7 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             heuristic_rationale,
             fewshot_rationale,
             judge_mode_dropdown,
+            context,
         ],
         outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence],
         api_name=False,
@@ -422,12 +486,12 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
     gr.on(
         triggers=[rerun_btn.click],
         fn=run_heuristic_classifier,
-        inputs=[old_revision, new_revision],
+        inputs=[old_revision, new_revision, context],
         outputs=[heuristic_noteworthy, heuristic_rationale],
         api_name=False,
     ).then(
         fn=run_fewshot_classifier,
-        inputs=[old_revision, new_revision],
+        inputs=[old_revision, new_revision, context],
         outputs=[fewshot_noteworthy, fewshot_rationale],
         api_name=False,
     ).then(
@@ -440,6 +504,7 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             heuristic_rationale,
             fewshot_rationale,
             judge_mode_dropdown,
+            context,
         ],
         outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence],
         api_name=False,
