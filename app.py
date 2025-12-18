@@ -7,15 +7,17 @@ from wiki_data_fetcher import (
     get_revisions_behind,
     get_random_wikipedia_title,
 )
+from feedback import save_feedback_agree, save_feedback_disagree
 from models import classifier, judge
-import logfire
-from dotenv import load_dotenv
 from contextlib import nullcontext
+from dotenv import load_dotenv
+import logfire
+import os
 
 # Load API keys
 load_dotenv()
 # Setup logging with Logfire
-logfire.configure()
+logfire.configure(service_name="app")
 
 
 def start_parent_span(title: str, number: int, units: str):
@@ -419,6 +421,17 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
                 )
             rerun_btn = gr.Button("Rerun Model")
 
+            gr.Markdown("### Your feedback")
+            feedback_status = gr.Textbox(
+                label="",
+                lines=1,
+                interactive=False,
+                visible=True,
+            )
+            with gr.Row():
+                thumbs_up_btn = gr.Button("👍 Agree", variant="primary")
+                thumbs_down_btn = gr.Button("👎 Disagree", variant="secondary")
+
     # States to store boolean values
     heuristic_noteworthy = gr.State()
     fewshot_noteworthy = gr.State()
@@ -507,6 +520,55 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             context,
         ],
         outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence],
+        api_name=False,
+    )
+
+    # Feedback button handlers
+    thumbs_up_btn.click(
+        fn=save_feedback_agree,
+        inputs=[
+            title_input,
+            number_input,
+            units_dropdown,
+            judge_mode_dropdown,
+            old_revision,
+            new_revision,
+            old_timestamp,
+            new_timestamp,
+            heuristic_rationale,
+            fewshot_rationale,
+            judge_reasoning,
+            noteworthy_text,
+            confidence,
+            heuristic_noteworthy,
+            fewshot_noteworthy,
+            judge_noteworthy,
+        ],
+        outputs=[feedback_status],
+        api_name=False,
+    )
+
+    thumbs_down_btn.click(
+        fn=save_feedback_disagree,
+        inputs=[
+            title_input,
+            number_input,
+            units_dropdown,
+            judge_mode_dropdown,
+            old_revision,
+            new_revision,
+            old_timestamp,
+            new_timestamp,
+            heuristic_rationale,
+            fewshot_rationale,
+            judge_reasoning,
+            noteworthy_text,
+            confidence,
+            heuristic_noteworthy,
+            fewshot_noteworthy,
+            judge_noteworthy,
+        ],
+        outputs=[feedback_status],
         api_name=False,
     )
 
