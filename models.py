@@ -16,9 +16,6 @@ import logfire
 # Load API keys
 load_dotenv()
 
-# Setup Logfire
-logfire.configure()
-
 # This wraps Google Gen AI client calls
 # to capture prompts, responses, and metadata
 logfire.instrument_google_genai()

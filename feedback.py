@@ -68,7 +68,7 @@ def save_feedback(*args, feedback_value: str) -> None:
     with feedback_path.open("a") as f:
         f.write(json.dumps(feedback_dict))
         f.write("\n")
-    gr.Success(f"Saved your feedback: {feedback_value}", duration=2, title="Thank you!")
+    gr.Success(f"Saved feedback: <strong>{feedback_value}</strong>", duration=5)
 
 
 @logfire.instrument("Save feedback: agree")
