@@ -201,7 +201,6 @@ def _run_judge(
     fewshot_noteworthy: bool,
     heuristic_rationale: str,
     fewshot_rationale: str,
-    judge_mode: str,
 ):
     """
     Run judge on the revisions and classifiers' rationales.
@@ -213,7 +212,6 @@ def _run_judge(
         fewshot_noteworthy: Few-shot model's noteworthiness prediction
         heuristic_rationale: Heuristic model's rationale
         fewshot_rationale: Few-shot model's rationale
-        judge_mode: Mode for judge function ("unaligned", "aligned-fewshot", "aligned-heuristic")
 
     Returns:
         Tuple of (noteworthy, noteworthy_text, reasoning, confidence) (bool, str, str, str)
@@ -236,7 +234,7 @@ def _run_judge(
             new_revision,
             heuristic_rationale,
             fewshot_rationale,
-            mode=judge_mode,
+            mode="aligned-heuristic",
         )
         if result:
             noteworthy = result.get("noteworthy", "")

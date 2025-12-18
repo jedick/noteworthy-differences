@@ -67,7 +67,6 @@ def run_judge(
     fewshot_noteworthy: bool,
     heuristic_rationale: str,
     fewshot_rationale: str,
-    judge_mode: str,
     context=None,
 ):
     with logfire.attach_context(context) if context else nullcontext():
@@ -78,7 +77,6 @@ def run_judge(
             heuristic_noteworthy,
             heuristic_rationale,
             fewshot_rationale,
-            judge_mode,
         )
 
 
@@ -113,6 +111,26 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
         )
 
     with gr.Row():
+        with gr.Column():
+            with gr.Accordion("More Info", open=False) as accordion:
+                gr.Markdown(
+                    """#### Query Instructions
+                - Page title is case sensitive; use underscores or spaces
+                - Specify any number of days or up to 499 revisions behind
+                  - The closest available revision is retrieved
+                - Only article introductions are downloaded
+                """
+                )
+                gr.Markdown(
+                    """#### Confidence Key
+                    - **High:** heuristic = few-shot, judge agrees
+                    - **Moderate:** heuristic ≠ few-shot, judge decides
+                    - **Questionable:** heuristic = few-shot, judge vetoes
+                    """
+                )
+            random_btn = gr.Button(
+                "Get Random Page Title", size="md", elem_id="random-button"
+            )
         title_input = gr.Textbox(
             label="Wikipedia Page Title", placeholder="e.g., Albert Einstein", value=""
         )
@@ -120,75 +138,64 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
         units_dropdown = gr.Dropdown(
             choices=["revisions", "days"], value="revisions", label="Units"
         )
-        judge_mode = gr.Dropdown(
-            choices=["unaligned", "aligned-fewshot", "aligned-heuristic"],
-            value="aligned-heuristic",
-            label="Judge Mode",
-        )
         with gr.Column():
-            random_btn = gr.Button("Get Random Page Title")
-            submit_btn = gr.Button("Fetch Revisions and Run Model", variant="primary")
+            submit_btn = gr.Button(
+                "Fetch Revisions and Run Model", size="md", variant="primary"
+            )
+            rerun_btn = gr.Button("Rerun Model", size="md")
 
     with gr.Row():
-        with gr.Column():
+        with gr.Column(scale=1):
             gr.Markdown("### Old Revision")
             old_timestamp = gr.Markdown("")
             old_revision = gr.Textbox(label="", lines=15, max_lines=30, container=False)
-            gr.Markdown(
-                """#### Query Instructions
-            - Page title is case sensitive; use underscores or spaces
-            - Specify any number of days or up to 499 revisions behind
-              - The closest available revision is retrieved
-            - Only article introductions are downloaded
-            """
-            )
 
-        with gr.Column():
+        with gr.Column(scale=1):
             gr.Markdown("### Current Revision")
             new_timestamp = gr.Markdown("")
             new_revision = gr.Textbox(label="", lines=15, max_lines=30, container=False)
-            gr.Markdown(
-                """#### Confidence Key
-                - **High:** heuristic = few-shot, judge agrees
-                - **Moderate:** heuristic ≠ few-shot, judge decides
-                - **Questionable:** heuristic = few-shot, judge vetoes
-                """
-            )
 
-        with gr.Column():
+        with gr.Column(scale=2):
             gr.Markdown("### Model Output")
-            heuristic_rationale = gr.Textbox(
-                label="◇ Heuristic Model's Rationale",
-                lines=2,
-                max_lines=7,
-            )
-            fewshot_rationale = gr.Textbox(
-                label="∴ Few-shot Model's Rationale",
-                lines=2,
-                max_lines=7,
-            )
-            judge_reasoning = gr.Textbox(
-                label="⚖ Judge's Reasoning",
-                lines=2,
-                max_lines=7,
-            )
-            with gr.Row(variant="default"):
-                noteworthy_text = gr.Textbox(
-                    label="Noteworthy Differences",
-                    lines=1,
-                    interactive=False,
-                )
-                confidence = gr.Textbox(
-                    label="Confidence",
-                    lines=1,
-                    interactive=False,
-                )
-            rerun_btn = gr.Button("Rerun Model")
-
-            gr.Markdown("### 👥 Your feedback")
             with gr.Row():
-                thumbs_up_btn = gr.Button("👍 Agree", variant="primary")
-                thumbs_down_btn = gr.Button("👎 Disagree", variant="primary")
+                with gr.Column():
+                    heuristic_rationale = gr.Textbox(
+                        label="◇ Heuristic Model's Rationale",
+                        lines=2,
+                        max_lines=7,
+                    )
+                    fewshot_rationale = gr.Textbox(
+                        label="∴ Few-shot Model's Rationale",
+                        lines=2,
+                        max_lines=7,
+                    )
+                    judge_reasoning = gr.Textbox(
+                        label="⚖ Judge's Reasoning",
+                        lines=2,
+                        max_lines=7,
+                    )
+
+                with gr.Column():
+                    with gr.Row(variant="default"):
+                        noteworthy_text = gr.Textbox(
+                            label="Noteworthy Differences",
+                            lines=1,
+                            interactive=False,
+                        )
+                        confidence = gr.Textbox(
+                            label="Confidence",
+                            lines=1,
+                            interactive=False,
+                        )
+
+                    gr.Markdown("### 👥 Your feedback")
+                    with gr.Row():
+                        thumbs_up_btn = gr.Button(
+                            "👍 Agree", size="md", variant="primary"
+                        )
+                        thumbs_down_btn = gr.Button(
+                            "👎 Disagree", size="md", variant="primary"
+                        )
 
     # States to store boolean values
     heuristic_noteworthy = gr.State()
@@ -246,7 +253,6 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             fewshot_noteworthy,
             heuristic_rationale,
             fewshot_rationale,
-            judge_mode,
             context,
         ],
         outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence],
@@ -274,7 +280,6 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             fewshot_noteworthy,
             heuristic_rationale,
             fewshot_rationale,
-            judge_mode,
             context,
         ],
         outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence],
@@ -288,7 +293,6 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             title_input,
             number_input,
             units_dropdown,
-            judge_mode,
             old_revision,
             new_revision,
             old_timestamp,
@@ -311,7 +315,6 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             title_input,
             number_input,
             units_dropdown,
-            judge_mode,
             old_revision,
             new_revision,
             old_timestamp,
@@ -341,6 +344,10 @@ if __name__ == "__main__":
     table, tr, td {
         border: none; /* Removes all borders */
         border-collapse: collapse; /* Ensures no gaps between cells */
+    }
+
+    #random-button {
+        margin-top: auto; /* Pushes the button to the bottom */
     }
     """
 

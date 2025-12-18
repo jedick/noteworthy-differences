@@ -45,7 +45,6 @@ def save_feedback(*args, feedback_value: str) -> None:
         "title_input",
         "number_input",
         "units_dropdown",
-        "judge_mode_dropdown",
         "old_revision",
         "new_revision",
         "old_timestamp",
