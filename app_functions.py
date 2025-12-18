@@ -172,16 +172,10 @@ def compute_confidence(
     heuristic_noteworthy,
     fewshot_noteworthy,
     judge_noteworthy,
-    heuristic_rationale,
-    fewshot_rationale,
-    judge_reasoning,
 ):
     """
     Compute a confidence label using the noteworthy booleans.
     """
-    # Return None if any of the rationales or reasoning is missing.
-    if not heuristic_rationale or not fewshot_rationale or not judge_reasoning:
-        return None
     if heuristic_noteworthy == fewshot_noteworthy == judge_noteworthy:
         # Classifiers and judge all agree
         return "High"
@@ -253,14 +247,15 @@ def _run_judge(
     else:
         noteworthy_text = str(noteworthy)
 
-    # Get confidence score
-    confidence = compute_confidence(
-        heuristic_noteworthy,
-        fewshot_noteworthy,
-        noteworthy,
-        heuristic_rationale,
-        fewshot_rationale,
-        reasoning,
-    )
+    # Return no confidence score if any of the rationales or reasoning is missing
+    if not heuristic_rationale or not fewshot_rationale or not reasoning:
+        confidence = None
+    else:
+        # Get confidence score
+        confidence = compute_confidence(
+            heuristic_noteworthy,
+            fewshot_noteworthy,
+            noteworthy,
+        )
 
     return noteworthy, noteworthy_text, reasoning, confidence

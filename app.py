@@ -74,7 +74,7 @@ def run_judge(
             old_revision,
             new_revision,
             heuristic_noteworthy,
-            heuristic_noteworthy,
+            fewshot_noteworthy,
             heuristic_rationale,
             fewshot_rationale,
         )
