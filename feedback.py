@@ -42,9 +42,9 @@ def save_feedback(*args, feedback_value: str) -> None:
     """
     # Assign dict keys to positional arguments
     keys = [
-        "title_input",
-        "number_input",
-        "units_dropdown",
+        "page_title",
+        "number_behind",
+        "units_behind",
         "old_revision",
         "new_revision",
         "old_timestamp",
@@ -61,13 +61,51 @@ def save_feedback(*args, feedback_value: str) -> None:
     feedback_dict = dict(zip(keys, args))
     # Add feedback value
     feedback_dict["feedback"] = feedback_value
-    # Save feedback to file
-    feedback_file = f"train-{datetime.now().isoformat()}.json"
-    feedback_path = USER_FEEDBACK_DIR / feedback_file
-    with feedback_path.open("a") as f:
-        f.write(json.dumps(feedback_dict))
-        f.write("\n")
-    gr.Success(f"Saved feedback: <strong>{feedback_value}</strong>", duration=5)
+    do_save = True
+    feedback_action = "Saved"
+
+    # Check for duplicate feedback against the most recent feedback file
+    feedback_files = sorted(
+        USER_FEEDBACK_DIR.glob("*.json"),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    if feedback_files:
+        latest_feedback_path = feedback_files[0]
+        with latest_feedback_path.open("r") as latest_f:
+            # Files are written as JSON Lines, but currently contain a single line
+            latest_line = latest_f.readline().strip()
+            if latest_line:
+                latest_feedback = json.loads(latest_line)
+                # Pop the last feedback value
+                old_feedback = latest_feedback.pop("feedback", None)
+                # Use the same feedback value (for detecting resubmission)
+                latest_feedback["feedback"] = feedback_value
+                if latest_feedback == feedback_dict:
+                    # The user resubmitted feedback: remove the previous feedback
+                    latest_feedback_path.unlink()
+                    if feedback_dict["feedback"] == old_feedback:
+                        # The user submitted the same feedback: Issue a warning
+                        gr.Warning(
+                            f"Removed feedback: <strong>{old_feedback}</strong>",
+                            duration=5,
+                        )
+                        do_save = False
+                    else:
+                        # The user changed the feedback: Proceed to update the feedback
+                        feedback_action = "Updated"
+
+    if do_save:
+        # Save feedback to file
+        feedback_file = f"train-{datetime.now().isoformat()}.json"
+        feedback_path = USER_FEEDBACK_DIR / feedback_file
+        with feedback_path.open("a") as f:
+            f.write(json.dumps(feedback_dict))
+            f.write("\n")
+        if feedback_action == "Updated":
+            gr.Info(f"Updated feedback: <strong>{feedback_value}</strong>", duration=5)
+        else:
+            gr.Success(f"Saved feedback: <strong>{feedback_value}</strong>", duration=5)
 
 
 @logfire.instrument("Save feedback: agree")

@@ -107,38 +107,43 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
         </table>
 
         """,
-            elem_id="intro_table",
+            elem_id="intro-table",
         )
 
     with gr.Row():
-        with gr.Column():
-            with gr.Accordion("More Info", open=False) as accordion:
+        with gr.Column(scale=1):
+            with gr.Accordion("Query Instructions", open=False) as accordion:
                 gr.Markdown(
-                    """#### Query Instructions
+                    """
                 - Page title is case sensitive; use underscores or spaces
                 - Specify any number of days or up to 499 revisions behind
                   - The closest available revision is retrieved
                 - Only article introductions are downloaded
                 """
                 )
+            with gr.Accordion("Confidence Scores", open=False) as accordion:
                 gr.Markdown(
-                    """#### Confidence Key
+                    """
                     - **High:** heuristic = few-shot, judge agrees
                     - **Moderate:** heuristic ≠ few-shot, judge decides
                     - **Questionable:** heuristic = few-shot, judge vetoes
                     """
                 )
-            random_btn = gr.Button(
-                "Get Random Page Title", size="md", elem_id="random-button"
-            )
-        title_input = gr.Textbox(
-            label="Wikipedia Page Title", placeholder="e.g., Albert Einstein", value=""
-        )
-        number_input = gr.Number(label="Number", value=50, minimum=0, precision=0)
-        units_dropdown = gr.Dropdown(
-            choices=["revisions", "days"], value="revisions", label="Units"
-        )
-        with gr.Column():
+        with gr.Column(scale=3):
+            with gr.Row():
+                page_title = gr.Textbox(
+                    label="Wikipedia Page Title",
+                    placeholder="e.g., Albert Einstein",
+                    value="",
+                )
+                number_behind = gr.Number(
+                    label="Number", value=50, minimum=0, precision=0
+                )
+                units_behind = gr.Dropdown(
+                    choices=["revisions", "days"], value="revisions", label="Units"
+                )
+        with gr.Column(scale=1):
+            random_btn = gr.Button("Get Random Page Title", size="md")
             submit_btn = gr.Button(
                 "Fetch Revisions and Run Model", size="md", variant="primary"
             )
@@ -207,12 +212,12 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
     random_btn.click(
         fn=get_random_wikipedia_title,
         inputs=None,
-        outputs=[title_input],
+        outputs=[page_title],
     )
 
     gr.on(
         # Press Enter in textbox or use button to submit
-        triggers=[title_input.submit, submit_btn.click],
+        triggers=[page_title.submit, submit_btn.click],
         # Clear the new_revision and new_timestamp values before proceeding.
         # The empty values will propagate to the other components (through function return values) if there is an error.
         fn=lambda: (gr.update(value=""), gr.update(value="")),
@@ -222,16 +227,16 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
     ).then(
         # Initialize Logfire context
         fn=start_parent_span,
-        inputs=[title_input, number_input, units_dropdown],
+        inputs=[page_title, number_behind, units_behind],
         outputs=context,
     ).then(
         fn=fetch_current_revision,
-        inputs=[title_input, context],
+        inputs=[page_title, context],
         outputs=[new_revision, new_timestamp],
         api_name=False,
     ).then(
         fn=fetch_previous_revision,
-        inputs=[title_input, number_input, units_dropdown, new_revision, context],
+        inputs=[page_title, number_behind, units_behind, new_revision, context],
         outputs=[old_revision, old_timestamp],
         api_name=False,
     ).then(
@@ -290,9 +295,9 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
     thumbs_up_btn.click(
         fn=save_feedback_agree,
         inputs=[
-            title_input,
-            number_input,
-            units_dropdown,
+            page_title,
+            number_behind,
+            units_behind,
             old_revision,
             new_revision,
             old_timestamp,
@@ -312,9 +317,9 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
     thumbs_down_btn.click(
         fn=save_feedback_disagree,
         inputs=[
-            title_input,
-            number_input,
-            units_dropdown,
+            page_title,
+            number_behind,
+            units_behind,
             old_revision,
             new_revision,
             old_timestamp,
@@ -340,14 +345,10 @@ if __name__ == "__main__":
     head = '<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">'
     # Use CSS to style table
     css = """
-    #intro_table {background-color: #eff6ff}
+    #intro-table {background-color: #eff6ff}
     table, tr, td {
         border: none; /* Removes all borders */
         border-collapse: collapse; /* Ensures no gaps between cells */
-    }
-
-    #random-button {
-        margin-top: auto; /* Pushes the button to the bottom */
     }
     """
 
