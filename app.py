@@ -19,15 +19,16 @@ from app_functions import (
     _run_heuristic_classifier,
     _run_fewshot_classifier,
     _run_judge,
+    find_interesting_example,
 )
 
 
-def start_parent_span(title: str, number: int, units: str):
+def start_parent_span(page_title: str, number_behind: int, units_behind: str):
     """
     Start a parent span and return the context for propagation to children.
     See https://logfire.pydantic.dev/docs/how-to-guides/distributed-tracing/#manual-context-propagation
     """
-    span_name = f"{title} - {number} {units}"
+    span_name = f"{page_title} - {number_behind} {units_behind}"
     with logfire.span(span_name) as span:
         span.__enter__()
         context = logfire.get_context()
@@ -93,15 +94,15 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
           </colgroup>
           <tr>
             <td>
-              <i class="fa-brands fa-wikipedia-w"></i> Compare current and old revisions of a Wikipedia article.<br>
-              📅 You choose the number of revisions or days behind.
+              <i class="fa-brands fa-wikipedia-w"></i> Compare current and old revisions of a Wikipedia article<br>
+              📅 You choose the number of revisions or days behind
             </td>
             <td>
-              ◇ ∴ ⚖ Two classifier models and a judge predict the noteworthiness of the differences.
+              ◇ ∴ ⚖ Two classifier models and a judge predict the noteworthiness of the differences
             </td>
             <td>
-              <i class="fa-brands fa-github"></i> The <a href="https://github.com/jedick/noteworthy-differences">GitHub repository</a> describes how the judge was aligned with human preferences.<br>
-              👥 The <a href="https://huggingface.co/datasets/jedick/noteworthy-differences-feedback">feedback dataset</a> holds all user feedback collected to date.
+              <i class="fa-brands fa-github"></i> The <a href="https://github.com/jedick/noteworthy-differences">GitHub repository</a> describes how the judge was aligned with human preferences<br>
+              👥 The <a href="https://huggingface.co/datasets/jedick/noteworthy-differences-feedback">feedback dataset</a> holds all user feedback collected to date
               </td>
           </tr>
         </table>
@@ -202,6 +203,17 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
                         )
                         thumbs_down_btn = gr.Button(
                             "👎 Disagree", size="md", variant="primary"
+                        )
+                    with gr.Accordion("Find Interesting Example", open=True):
+                        special_random_btn = gr.Button(
+                            "🎲 Special Random", size="md", variant="secondary"
+                        )
+                        gr.Markdown(
+                            """
+                        *Click to find an interesting example
+                        by running the model on random pages
+                        until we get a confidence score that is not High,
+                        up to 20 tries*"""
                         )
 
     # States to store boolean values
@@ -331,6 +343,28 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             heuristic_noteworthy,
             fewshot_noteworthy,
             judge_noteworthy,
+            confidence_score,
+        ],
+        api_name=False,
+    )
+
+    # Special random button handler
+    special_random_btn.click(
+        fn=find_interesting_example,
+        inputs=[number_behind, units_behind],
+        outputs=[
+            page_title,
+            new_revision,
+            new_timestamp,
+            old_revision,
+            old_timestamp,
+            heuristic_noteworthy,
+            fewshot_noteworthy,
+            judge_noteworthy,
+            heuristic_rationale,
+            fewshot_rationale,
+            judge_reasoning,
+            noteworthy_text,
             confidence_score,
         ],
         api_name=False,

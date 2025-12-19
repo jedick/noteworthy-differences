@@ -4,6 +4,7 @@ from wiki_data_fetcher import (
     get_wikipedia_introduction,
     extract_revision_info,
     get_revisions_behind,
+    get_random_wikipedia_title,
 )
 from models import classifier, judge
 import gradio as gr
@@ -259,3 +260,108 @@ def _run_judge(
         )
 
     return noteworthy, noteworthy_text, reasoning, confidence
+
+
+@logfire.instrument("🎲 Special Random")
+def find_interesting_example(number_behind: int, units_behind: str):
+    """
+    Find an interesting example by repeatedly getting random pages and running the model
+    until we find one with a confidence score that is not High, up to 20 tries.
+    """
+    max_tries = 20
+
+    for attempt in range(max_tries):
+        # Get random page title
+        page_title = get_random_wikipedia_title()
+        if not page_title:
+            continue
+
+        gr.Info(f"Page title {attempt + 1}: {page_title}", duration=20)
+
+        try:
+            # Initialize Logfire span
+            span_name = f"{page_title} - {number_behind} {units_behind}"
+            with logfire.span(span_name):
+
+                # Fetch current revision
+                new_revision, new_timestamp = _fetch_current_revision(page_title)
+                if not new_revision:
+                    continue
+
+                # Fetch previous revision
+                old_revision, old_timestamp = _fetch_previous_revision(
+                    page_title, number_behind, units_behind, new_revision
+                )
+                if not old_revision:
+                    continue
+
+                # Run heuristic classifier
+                heuristic_noteworthy, heuristic_rationale = _run_heuristic_classifier(
+                    old_revision, new_revision
+                )
+                if heuristic_rationale is None:
+                    continue
+
+                # Run few-shot classifier
+                fewshot_noteworthy, fewshot_rationale = _run_fewshot_classifier(
+                    old_revision, new_revision
+                )
+                if fewshot_rationale is None:
+                    continue
+
+                # Run judge
+                judge_noteworthy, noteworthy_text, judge_reasoning, confidence_score = (
+                    _run_judge(
+                        old_revision,
+                        new_revision,
+                        heuristic_noteworthy,
+                        fewshot_noteworthy,
+                        heuristic_rationale,
+                        fewshot_rationale,
+                    )
+                )
+
+            # Check if confidence score is not High
+            if confidence_score and confidence_score != "High":
+                # Found an interesting example
+                gr.Success(
+                    "Interesting example - ready for your feedback", duration=None
+                )
+                return (
+                    page_title,
+                    new_revision,
+                    new_timestamp,
+                    old_revision,
+                    old_timestamp,
+                    heuristic_noteworthy,
+                    fewshot_noteworthy,
+                    judge_noteworthy,
+                    heuristic_rationale,
+                    fewshot_rationale,
+                    judge_reasoning,
+                    noteworthy_text,
+                    confidence_score,
+                )
+
+        except Exception:
+            # If there's an error, continue to next attempt
+            continue
+
+    # If we get here, all 20 tries had High confidence
+    gr.Warning("No interesting examples found - try again", duration=None)
+    # Return empty values
+    return (
+        "",
+        "",
+        "",
+        "",
+        "",
+        None,
+        None,
+        None,
+        "",
+        "",
+        "",
+        "",
+        "",
+    )
