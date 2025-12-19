@@ -6,6 +6,7 @@ import gradio as gr
 import logfire
 import json
 import os
+import re
 
 # Load API keys
 load_dotenv()
@@ -53,12 +54,38 @@ def save_feedback(*args, feedback_value: str) -> None:
         "fewshot_rationale",
         "judge_reasoning",
         "noteworthy_text",
-        "confidence",
+        "confidence_score",
         "heuristic_noteworthy",
         "fewshot_noteworthy",
         "judge_noteworthy",
     ]
     feedback_dict = dict(zip(keys, args))
+
+    # Data cleanup
+    # Split dictionary in two
+    keys_start = {"page_title", "number_behind", "units_behind"}
+    dict_start = {k: v for k, v in feedback_dict.items() if k in keys_start}
+    dict_end = {k: v for k, v in feedback_dict.items() if k not in keys_start}
+    # Normalize timestamp and extract revisions behind from display string
+    raw_new_timestamp = dict_end.get("new_timestamp", "")
+    # Extract ISO timestamp (e.g. 2013-12-09T04:48:24Z)
+    ts_match = re.search(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", raw_new_timestamp)
+    if ts_match:
+        dict_end["new_timestamp"] = ts_match.group(0)
+    # Do the same for old timestamp
+    raw_old_timestamp = dict_end.get("old_timestamp", "")
+    ts_match = re.search(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z", raw_old_timestamp)
+    if ts_match:
+        dict_end["old_timestamp"] = ts_match.group(0)
+    # Extract revisions behind (e.g. "35 revisions behind")
+    rev_match = re.search(r"(\d+)\s+revisions?\s+behind", raw_old_timestamp)
+    if rev_match:
+        dict_start["revisions_behind"] = int(rev_match.group(1))
+    else:
+        dict_start["revisions_behind"] = None
+    # Merge the start and end dictionaries
+    feedback_dict = dict_start | dict_end
+
     # Add feedback value
     feedback_dict["feedback"] = feedback_value
     do_save = True

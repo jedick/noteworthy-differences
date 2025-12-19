@@ -137,10 +137,12 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
                     value="",
                 )
                 number_behind = gr.Number(
-                    label="Number", value=50, minimum=0, precision=0
+                    label="Number Behind", value=50, minimum=0, precision=0
                 )
                 units_behind = gr.Dropdown(
-                    choices=["revisions", "days"], value="revisions", label="Units"
+                    choices=["revisions", "days"],
+                    value="revisions",
+                    label="Units Behind",
                 )
         with gr.Column(scale=1):
             random_btn = gr.Button("Get Random Page Title", size="md")
@@ -187,8 +189,8 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
                             lines=1,
                             interactive=False,
                         )
-                        confidence = gr.Textbox(
-                            label="Confidence",
+                        confidence_score = gr.Textbox(
+                            label="Confidence Score",
                             lines=1,
                             interactive=False,
                         )
@@ -260,7 +262,7 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             fewshot_rationale,
             context,
         ],
-        outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence],
+        outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence_score],
         api_name=False,
     )
 
@@ -287,7 +289,7 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             fewshot_rationale,
             context,
         ],
-        outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence],
+        outputs=[judge_noteworthy, noteworthy_text, judge_reasoning, confidence_score],
         api_name=False,
     )
 
@@ -306,7 +308,7 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             fewshot_rationale,
             judge_reasoning,
             noteworthy_text,
-            confidence,
+            confidence_score,
             heuristic_noteworthy,
             fewshot_noteworthy,
             judge_noteworthy,
@@ -328,7 +330,7 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
             fewshot_rationale,
             judge_reasoning,
             noteworthy_text,
-            confidence,
+            confidence_score,
             heuristic_noteworthy,
             fewshot_noteworthy,
             judge_noteworthy,
