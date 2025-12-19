@@ -46,18 +46,17 @@ def save_feedback(*args, feedback_value: str) -> None:
         "page_title",
         "number_behind",
         "units_behind",
-        "old_revision",
-        "new_revision",
         "old_timestamp",
         "new_timestamp",
+        "old_revision",
+        "new_revision",
         "heuristic_rationale",
         "fewshot_rationale",
         "judge_reasoning",
-        "noteworthy_text",
-        "confidence_score",
         "heuristic_noteworthy",
         "fewshot_noteworthy",
         "judge_noteworthy",
+        "confidence_score",
     ]
     feedback_dict = dict(zip(keys, args))
 
