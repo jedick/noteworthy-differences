@@ -276,7 +276,7 @@ def find_interesting_example(number_behind: int, units_behind: str):
         if not page_title:
             continue
 
-        gr.Info(f"Page title {attempt + 1}: {page_title}", duration=20)
+        gr.Info(f"Page {attempt + 1}: {page_title}", duration=20)
 
         try:
             # Initialize Logfire span
@@ -325,7 +325,7 @@ def find_interesting_example(number_behind: int, units_behind: str):
             if confidence_score and confidence_score != "High":
                 # Found an interesting example
                 gr.Success(
-                    "Interesting example - ready for your feedback", duration=None
+                    f"Interesting example (page {attempt + 1}) - ready for your feedback", duration=None
                 )
                 return (
                     page_title,

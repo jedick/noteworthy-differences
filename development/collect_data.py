@@ -15,7 +15,7 @@ intro_0, intro_10, intro_100 = [], [], []
 if __name__ == "__main__":
 
     # Open the file in read mode
-    with open("data/wikipedia_titles.txt", "r") as file:
+    with open("development/wikipedia_titles.txt", "r") as file:
         # Iterate through each line in the file
         for line in file:
             # Get title from each line without trailing newline characters
@@ -56,7 +56,7 @@ if __name__ == "__main__":
             # fmt: on
 
             with open(
-                "data/wikipedia_introductions.csv", "w", newline="", encoding="utf-8"
+                "development/wikipedia_introductions.csv", "w", newline="", encoding="utf-8"
             ) as myfile:
                 wr = csv.writer(myfile)
                 # Write a header row

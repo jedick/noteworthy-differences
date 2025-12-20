@@ -4,13 +4,13 @@ from models import classifier
 
 def run_classifier(row):
     """
-    Run the model on one row of data from 'data/wikipedia_introductions.csv'.
+    Run the model on one row of data from 'development/wikipedia_introductions.csv'.
     The model is run up to four times: two prompt styles (heuristic and few-shot)
     and two revision intervals (from 10th and 100th previous revisions to current).
 
     Usage:
 
-    df = pd.read_csv("data/wikipedia_introductions.csv")
+    df = pd.read_csv("development/wikipedia_introductions.csv")
     row = df.iloc[38]
     run_classifier(row)
     """
@@ -29,11 +29,11 @@ def run_classifier(row):
 if __name__ == "__main__":
 
     """
-    Run the classifier on all rows from 'data/wikipedia_introductions.csv' and save results in 'data/examples.csv'.
+    Run the classifier on all rows from 'development/wikipedia_introductions.csv' and save results in 'development/examples.csv'.
     """
 
     # Read the data
-    df = pd.read_csv("data/wikipedia_introductions.csv")
+    df = pd.read_csv("development/wikipedia_introductions.csv")
 
     # For reference: Find row indices with at least one missing value
     # missing_rows = df.index[df.isnull().any(axis=1)].tolist()
@@ -66,4 +66,4 @@ if __name__ == "__main__":
         else:
             df_out = pd.concat([df_out, df_row])
         # Write CSV in every loop to avoid data loss if errors occur
-        df_out.to_csv("data/examples.csv", index=False, encoding="utf-8")
+        df_out.to_csv("development/examples.csv", index=False, encoding="utf-8")

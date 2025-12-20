@@ -45,39 +45,47 @@ By contrast, using the full revisions would bloat the alignment prompt with most
 
 **Python:** See [usage-examples.md](usage-examples.md) for examples of retrieving Wikipedia page revisions and running classifier and judge models.
 
-**Pytest:** See `test_models.py` and `test_workflows.py` for pytest fixtures.
+**Pytest:** Tests are provided in `test_models.py` and are run with GitHub Actions.
 
 ## AI alignment pipeline
 
+There are two phases: development and production.
+In the development phase, we create an initial alignment from human annotation.
+In the production phase, we fine-tune the alignment through user feedback.
+
+<details>
+<summary>Phase 1: development</summary>
+
 > [!NOTE]
+> All scripts and output files are in the `development` directory.
 > Run the pipeline with different Main Pages (step 1) to make the training and test sets.
 > Skip the Alignment step for evaluations with the test set.
  
-1. **Initial preparation:** Run `data/get_titles.R` to extract and save the page titles linked from the Wikipedia Main Page to `data/wikipedia_titles.txt`.
+1. **Initial preparation:** Run `get_titles.R` to extract and save the page titles linked from the Wikipedia Main Page to `wikipedia_titles.txt`.
 *This is optional; do this to use a newer set of page titles than the ones provided here.*
   
 2. **Collect data:** Run `collect_data.py` to retrieve revision id, timestamp, and page introductions for 0, 10, and 100 revisions before current.
-The results are saved to `data/wikipedia_introductions.csv`.
+The results are saved to `wikipedia_introductions.csv`.
 
-3. **Create examples:** Run `create_examples.py` to run the classifier and save the results to `data/examples.csv`.
+3. **Create examples:** Run `create_examples.py` to run the classifier and save the results to `examples.csv`.
 The model is run up to four times for each example:
 two prompt styles (heuristic and few-shot) and two revision intervals (between current and 10th and 100th previous revisions, if available).
 
-4. **Human annotation:** Run `data/extract_disagreements.R` to extract the examples where the heuristic and few-shot models disagree.
-These are saved in `data/disagreements_for_human.csv` (only Wikipedia introductions) and `data/disagreements_for_AI.csv` (introductions and classifier responses).
+4. **Human annotation:** Run `extract_disagreements.R` to extract the examples where the heuristic and few-shot models disagree.
+These are saved in `disagreements_for_human.csv` (only Wikipedia introductions) and `disagreements_for_AI.csv` (introductions and classifier responses).
 *Without looking at the classifier responses*,
-the annotator fills in the `noteworthy` (True/False) and `rationale` columns in the for-human CSV file and saves it as `data/human_alignments.csv`.
+the annotator fills in the `noteworthy` (True/False) and `rationale` columns in the for-human CSV file and saves it as `human_alignments.csv`.
 
 5. **Unaligned AI judge:** Run `judge_disagreements.py` to run the unaligned judge on the examples where the models disagree.
-The results are saved to `data/AI_judgments_unaligned.csv`.
+The results are saved to `AI_judgments_unaligned.csv`.
 
-6. **Alignment:** Run `data/align_judge.R` to collect the alignment data into `data/alignment_fewshot.txt`.
+6. **Alignment:** Run `align_judge.R` to collect the alignment data into `alignment_fewshot.txt`.
 The alignment text consist of True/False labels and rationales from the human annotator and rationales from the classifiers.
-A heuristic prompt created from the alignment text using a different LLM is in `data/alignment_heuristic.txt`.
+A heuristic prompt created from the alignment text using a different LLM is in `alignment_heuristic.txt`.
 
 7. **Evaluate:** Run `judge_disagreements.py --aligned` to run the aligned judge on the examples where the models disagree;
-the results are saved to `data/AI_judgments_fewshot.csv`.
-Then run `data/summarize_results.R` to compute the summary statistics (results listed below).
+the results are saved to `AI_judgments_fewshot.csv`.
+Then run `summarize_results.R` to compute the summary statistics (results listed below).
 
 ## Results
 
@@ -110,3 +118,4 @@ Then run `data/summarize_results.R` to compute the summary statistics (results l
 - Accuracy scores are for the hard examples, not the entire dataset
   - Lower performance on test set may be due to concept drift (i.e., annotator fatigue)
 
+</details>

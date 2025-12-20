@@ -99,11 +99,11 @@ def judge(old_revision, new_revision, rationale_1, rationale_2, mode="unaligned"
     if mode == "unaligned":
         alignment_text = ""
     elif mode == "aligned-fewshot":
-        with open("data/alignment_fewshot.txt", "r") as file:
+        with open("development/alignment_fewshot.txt", "r") as file:
             lines = file.readlines()
             alignment_text = "".join(lines)
     elif mode == "aligned-heuristic":
-        with open("data/alignment_heuristic.txt", "r") as file:
+        with open("development/alignment_heuristic.txt", "r") as file:
             lines = file.readlines()
             alignment_text = "".join(lines)
     else:
