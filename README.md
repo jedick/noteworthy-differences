@@ -81,7 +81,7 @@ The results are saved to `AI_judgments_unaligned.csv`.
 
 6. **Alignment:** Run `align_judge.R` to collect the alignment data into `alignment_fewshot.txt`.
 The alignment text consist of True/False labels and rationales from the human annotator and rationales from the classifiers.
-A heuristic prompt created from the alignment text using a different LLM is in `alignment_heuristic.txt`.
+A heuristic prompt created by rewriting the alignment text using an LLM is in `alignment_heuristic.txt`.
 
 7. **Evaluate:** Run `judge_disagreements.py --aligned` to run the aligned judge on the examples where the models disagree;
 the results are saved to `AI_judgments_fewshot.csv`.

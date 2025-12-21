@@ -56,7 +56,10 @@ if __name__ == "__main__":
             # fmt: on
 
             with open(
-                "development/wikipedia_introductions.csv", "w", newline="", encoding="utf-8"
+                "development/wikipedia_introductions.csv",
+                "w",
+                newline="",
+                encoding="utf-8",
             ) as myfile:
                 wr = csv.writer(myfile)
                 # Write a header row

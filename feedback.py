@@ -7,6 +7,7 @@ import logfire
 import json
 import os
 import re
+import random
 
 # Load API keys
 load_dotenv()
@@ -122,8 +123,10 @@ def save_feedback(*args, feedback_value: str) -> None:
                         feedback_action = "Updated"
 
     if do_save:
+        # Randomly assign to train or test split (40% probability for test)
+        split = "test" if random.random() < 0.4 else "train"
         # Save feedback to file
-        feedback_file = f"train-{datetime.now().isoformat()}.json"
+        feedback_file = f"{split}-{datetime.now().isoformat()}.json"
         feedback_path = USER_FEEDBACK_DIR / feedback_file
         with feedback_path.open("a") as f:
             f.write(json.dumps(feedback_dict))

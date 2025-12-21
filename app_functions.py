@@ -325,7 +325,8 @@ def find_interesting_example(number_behind: int, units_behind: str):
             if confidence_score and confidence_score != "High":
                 # Found an interesting example
                 gr.Success(
-                    f"Interesting example (page {attempt + 1}) - ready for your feedback", duration=None
+                    f"Interesting example (page {attempt + 1}) - ready for your feedback",
+                    duration=None,
                 )
                 return (
                     page_title,
