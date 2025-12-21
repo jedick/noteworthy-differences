@@ -17,7 +17,7 @@ Return a JSON-formatted response with keys for:
 </new_revision>
 """
 
-analyzer_prompts = {
+classifier_prompts = {
     "heuristic": skeleton.replace(
         "{{instructions}}",
         """
@@ -88,4 +88,23 @@ Return a JSON-formatted response with keys for:
 <model_2_rationale>
 {{model_2_rationale}}
 </model_2_rationale>
+"""
+
+update_prompt = """
+You are fine-tuning an AI system for detecting noteworthy differences between Wikipedia article revisions.
+The system has two classifier models and an AI judge.
+The alignment text for the judge is provided below.
+Please update this alignment text based on the example text.
+The example text contains the models' responses as well as human feedback.
+You should change, remove or add alignment text wherever needed to make it consistent with the human feedback.
+The new alignment text should provide guidance to an LLM to make the correct choice on unseen examples.
+Respond only with an updated alignment text.
+
+<alignment_text>
+{{alignment_text}}
+</alignment_text>
+
+<examples_text>
+{{examples_text}}
+</examples_text>
 """

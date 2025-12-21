@@ -1,0 +1,68 @@
+## Noteworthy Changes (True)
+
+**Factual Additions/Corrections:**
+- Adding significant biographical details (birth year, occupations, cultural names). This includes quantifiable traits like height or blood type.
+- Updating population data to be significantly more current (5+ years).
+- Adding record-breaking characteristics or superlatives relevant to the article subject.
+- Inserting important geographical features (coastal location, landlocked status when not obvious).
+- Including cultural/historical context that wasn't inferable (nicknames with meaning, generational impact, direct quotes revealing significant personal preference).
+- Adding specific dates for events or tenures that were previously undated or only broadly described.
+
+**Tone & Neutrality:**
+- Removing vandalism or inappropriate language that destroys article neutrality.
+- Correcting words that radically alter tone (e.g., "lucky" when referring to deaths).
+
+**Substantive Content Changes:**
+- Altering the framing of historical events (different causes or contexts presented).
+- Adding causes or factors to complex events (mass displacement, additional contributing factors).
+- Expanding definitions to include **new significant categories or fundamental variations** (e.g., four-door coupes, multiple pronunciations, entirely new types of an object).
+- Adding **new or significantly altered** technical/scientific explanations for key properties or phenomena (vs. adding depth or nuance to existing explanations).
+- Removal of explicit lists of components (e.g., list of schools in a district) that define a subject's fundamental structure.
+- Significant factual updates to a subject's current status (e.g., changing 'plays for' to 'played in' and specifying league for a player).
+
+**Cultural Recognition:**
+- Including indigenous language names/scripts that honor cultural background.
+- Adding alternative official names (Latin, other languages) for historical agreements or places.
+- Adding native language pronunciation (e.g., IPA or romanization) when previously absent or incorrect/broken template.
+
+## Not Noteworthy Changes (False)
+
+**Minor Details:**
+- Grammatical adjustments, rephrasing, or structural reorganization. This includes minor grammatical corrections that may incidentally imply a factual update, but the core meaning remains clear (e.g., 'formally' to 'formerly', 'was' to 'is' when the status is broadly understood or easily inferable).
+- Adding locality specificity within already-stated regions (sub-district within district, specific county within a known state/country).
+- Adding nicknames without significant cultural/historical weight.
+- Word choice refinements that don't change fundamental meaning or fundamentally alter the subject's core identity or role (e.g., "locals" → "Indigenous people" as terminology update only; "fashion model" to "supermodel and activist"; "large" to "coeducational"; clarifying a 'brook' is a 'river' when its nature is implicit).
+- Removing specific birth/death *locations* (city, state/province) if the broader nationality or region is known or implied, and if no other essential geographical information about the person's origin or demise is lost.
+- Removal of alternative names or lesser-known designations if the primary identifier remains and the core identity is unaffected.
+- Adding official subtitles or taglines for media (e.g., TV season subtitles), which serve as additional identifiers rather than core content.
+- Adding an item to an existing, general list of types or instances if it doesn't represent a significant new category or a major increase in scope (e.g., adding one more country to a long list, one more hit song to an existing list, 'rapid transit' to railway types if the article broadly covers railway types).
+- Adding specific ordinal numbers (e.g., '60th governor', 'sixteenth album') or precise dates for tenures/events that are already generally known or broadly described.
+- Adding etymological meanings or detailed historical anecdotes/origins for names/terms if their primary identity and context are already established and the addition does not introduce new fundamental understanding or change the article's core narrative.
+- Adding relational context or familial prominence (e.g., 'disciple of X', 'member of prominent family') if it doesn't introduce specific new achievements, roles, or a fundamental shift in the subject's identity directly attributable to that relationship.
+- Adding universally known dates to major events already mentioned (e.g., "1485" for the Battle of Bosworth).
+
+**Inferable Information:**
+- Details implied by other information (e.g., "landlocked" when no coastal borders mentioned).
+- Ancestry relationships that explain omitted technical details.
+- Generalizing a location from a specific city to a broader country, when both are known/implied and no new specific information or clarification is provided.
+
+**Depth vs. Substance:**
+- Deeper analysis that doesn't change fundamental conclusions.
+- Additional technical details that provide nuance but not new fundamental understanding or mechanism for a concept.
+- Clarifications of already-conveyed information.
+- Minor statistical updates that don't represent significant temporal gaps.
+- Adding specific criteria or detailed definitions that deepen understanding of an existing concept but do not change its fundamental nature or core conclusion.
+
+**Administrative/Format Changes:**
+- Order changes in lists.
+- Removal of extraneous text or typos (unless they substantially affected meaning).
+- Template replacements with equivalent content (unless fixing a broken template that rendered information inaccessible).
+
+## Key Principles
+
+1.  **Inferability Test**: If the new information could be reasonably inferred from the old revision, or if it generalizes already specific information without adding new insight, it's likely not noteworthy.
+2.  **Completeness vs. Depth**: Adding information that makes an entry more complete by introducing **new core facts** (e.g., a previously missing occupation, birth year, specific height/blood type, adding a previously missing indigenous script) is noteworthy. Adding **deeper analysis, minor specificity, or additional context** to existing information without changing fundamental conclusions usually isn't.
+3.  **Context Matters**: The same change can be noteworthy or not depending on article context (longest year trivia is noteworthy on a year's own page).
+4.  **Temporal Significance**: Updates spanning 5+ years are noteworthy; minor year-to-year updates typically aren't.
+5.  **Framing Changes**: Alterations to how events or subjects are presented or understood at a fundamental, definitional level are noteworthy; descriptive upgrades or rewordings that preserve core meaning are not.
+6.  **Cultural Respect**: Additions recognizing cultural identity, indigenous languages, or heritage (e.g., native scripts, pronunciations, meaningful cultural names) are noteworthy.

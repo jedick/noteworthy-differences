@@ -1,0 +1,55 @@
+## Noteworthy Changes (True)
+
+**Factual Additions/Corrections:**
+- Adding significant biographical details (birth year, occupations, cultural names)
+- Updating population data to be significantly more current (5+ years)
+- Adding record-breaking characteristics or superlatives relevant to the article subject
+- Inserting important geographical features (coastal location, landlocked status when not obvious)
+- Including cultural/historical context that wasn't inferable (nicknames with meaning, generational impact)
+
+**Tone & Neutrality:**
+- Removing vandalism or inappropriate language that destroys article neutrality
+- Correcting words that radically alter tone (e.g., "lucky" when referring to deaths)
+
+**Substantive Content Changes:**
+- Altering the framing of historical events (different causes or contexts presented)
+- Adding causes or factors to complex events (mass displacement, additional contributing factors)
+- Expanding definitions to include significant variations (four-door coupes, multiple pronunciations)
+- Adding technical/scientific explanations for key properties or phenomena
+
+**Cultural Recognition:**
+- Including indigenous language names/scripts that honor cultural background
+- Adding alternative official names (Latin, other languages) for historical agreements or places
+
+## Not Noteworthy Changes (False)
+
+**Minor Details:**
+- Grammatical adjustments, rephrasing, or structural reorganization
+- Adding locality specificity within already-stated regions (sub-district within district)
+- Removing minor trivia that doesn't affect core understanding
+- Adding nicknames without significant cultural/historical weight
+- Word choice refinements that don't change meaning ("locals" → "Indigenous people" as terminology update only)
+
+**Inferable Information:**
+- Details implied by other information (e.g., "landlocked" when no coastal borders mentioned)
+- Ancestry relationships that explain omitted technical details
+
+**Depth vs. Substance:**
+- Deeper analysis that doesn't change fundamental conclusions
+- Additional technical details that provide nuance but not new understanding
+- Clarifications of already-conveyed information
+- Minor statistical updates that don't represent significant temporal gaps
+
+**Administrative/Format Changes:**
+- Order changes in lists
+- Removal of extraneous text or typos (unless they substantially affected meaning)
+- Template replacements with equivalent content
+
+## Key Principles
+
+1. **Inferability Test**: If the new information could be reasonably inferred from the old revision, it's likely not noteworthy
+2. **Completeness vs. Depth**: Adding information that makes an entry more complete (new occupation, birth year) is noteworthy; adding depth to existing information usually isn't
+3. **Context Matters**: The same change can be noteworthy or not depending on article context (longest year trivia is noteworthy on a year's own page)
+4. **Temporal Significance**: Updates spanning 5+ years are noteworthy; minor year-to-year updates typically aren't
+5. **Framing Changes**: Alterations to how events/subjects are presented or understood are noteworthy; rewordings that preserve meaning aren't
+6. **Cultural Respect**: Additions recognizing cultural identity, indigenous languages, or heritage are noteworthy

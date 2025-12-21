@@ -9,9 +9,11 @@ from dotenv import load_dotenv
 import json
 import os
 import pandas as pd
-from prompts import analyzer_prompts, judge_prompt
+from prompts import classifier_prompts, judge_prompt
 from retry_with_backoff import retry_with_backoff
 import logfire
+import re
+import glob
 
 # Load API keys
 load_dotenv()
@@ -22,6 +24,31 @@ logfire.instrument_google_genai()
 
 # Initialize the Gemini LLM
 client = genai.Client()
+
+
+def get_latest_iteration():
+    """
+    Find the latest iteration number from alignment files in the production directory.
+    Returns the highest numeric suffix from files matching alignment_*.txt pattern.
+    """
+    pattern = "production/alignment_*.txt"
+    files = glob.glob(pattern)
+
+    if not files:
+        raise FileNotFoundError(f"No alignment files found matching pattern: {pattern}")
+
+    max_iteration = 0
+    for file in files:
+        # Extract numeric suffix from filename (e.g., "alignment_2.txt" -> 2)
+        match = re.search(r"alignment_(\d+)\.txt$", file)
+        if match:
+            iteration = int(match.group(1))
+            max_iteration = max(max_iteration, iteration)
+
+    if max_iteration == 0:
+        raise ValueError("No valid iteration numbers found in alignment files")
+
+    return max_iteration
 
 
 @retry_with_backoff()
@@ -43,7 +70,7 @@ def classifier(old_revision, new_revision, prompt_style):
         return {"noteworthy": None, "rationale": None}
 
     # Get prompt template for given style
-    prompt_template = analyzer_prompts[prompt_style]
+    prompt_template = classifier_prompts[prompt_style]
 
     # Add article revisions to prompt
     prompt = prompt_template.replace("{{old_revision}}", old_revision).replace(
@@ -69,7 +96,14 @@ def classifier(old_revision, new_revision, prompt_style):
 
 
 @retry_with_backoff()
-def judge(old_revision, new_revision, rationale_1, rationale_2, mode="unaligned"):
+def judge(
+    old_revision,
+    new_revision,
+    rationale_1,
+    rationale_2,
+    mode="aligned-heuristic",
+    iteration=None,
+):
     """
     AI judge to settle disagreements between classification models
 
@@ -79,6 +113,7 @@ def judge(old_revision, new_revision, rationale_1, rationale_2, mode="unaligned"
         rationale_1: Rationale provided by model 1 (i.e., heuristic prompt)
         rationale_2: Rationale provided by model 2 (i.e., few-shot prompt)
         mode: Prompt mode: unaligned, aligned-fewshot, or aligned-heuristic
+        iteration: Iteration to use for heuristic alignment (None for latest)
 
     Returns:
         noteworthy: True if the differences are noteworthy; False if not
@@ -103,7 +138,10 @@ def judge(old_revision, new_revision, rationale_1, rationale_2, mode="unaligned"
             lines = file.readlines()
             alignment_text = "".join(lines)
     elif mode == "aligned-heuristic":
-        with open("development/alignment_heuristic.txt", "r") as file:
+        # Use latest iteration if iteration is None
+        if iteration is None:
+            iteration = get_latest_iteration()
+        with open(f"production/alignment_{str(iteration)}.txt", "r") as file:
             lines = file.readlines()
             alignment_text = "".join(lines)
     else:

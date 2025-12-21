@@ -48,6 +48,7 @@ if __name__ == "__main__":
                     df.iloc[index]["heuristic_rationale"],
                     df.iloc[index]["few-shot_rationale"],
                     mode=mode,
+                    iteration=1,
                 )
             except:
                 output = {"noteworthy": None, "reasoning": None}

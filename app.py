@@ -212,7 +212,7 @@ with gr.Blocks(title="Noteworthy Differences") as demo:
                             """
                         *Click to find an interesting example
                         by running the model on random pages
-                        until we get a confidence score that is not High,
+                        until the confidence score is not High,
                         up to 20 tries*"""
                         )
 

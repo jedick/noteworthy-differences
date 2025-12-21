@@ -3,41 +3,42 @@
 [![Open in HF Spaces](https://huggingface.co/datasets/huggingface/badges/resolve/main/open-in-hf-spaces-sm.svg)](https://huggingface.co/spaces/jedick/noteworthy-differences)
 
 Noteworthy differences are important in many situations.
-For example, project documents are frequently updated but you only want notifications for big changes.
 A goal of alignment is to train AI systems to detect changes that humans think are noteworthy.
+For example, project documents are frequently updated but you only want notifications for big changes.
+The specific data used in this project are old and new revisions of Wikipedia articles.
 
 <div align="center">
   <img src="image/headline-image.png" alt="Different-sized vertical lines represent frequent updates; bells above the longest lines represent notifications only for big changes" style="width:40%;"/>
 </div>
 
 
-This project implements an AI alignment pipeline with a two-stage architecture (classifiers and judge).
-The provides not only a label with reasoning but also a confidence estimate.
+This project implements an AI alignment pipeline with a multi-level architecture (classifiers and judge) and two alignment stages (development and production).
+The architecture provides a label with reasoning together with a confidence score.
+The multiple alignment stages provide for continuous learning.
 
-The data used in this project are old and new revisions of Wikipedia articles.
-Here is a summary of the pipeline:
+Summary of the architecture:
 
 - Classifiers with two different prompts (heuristic and few-shot) are used to:
   - Label differences between the revisions as noteworthy or not
   - Generate rationales for the classification
+- The output is sent to an AI judge to make the final call
+- For each query, the level of agreement among the classifiers and judge is used for the confidence score
+
+Summary of the development pipeline:
+
 - Examples where the classifiers *disagree* are forwarded to the human annotator
   - This allows the annotator to focus on a small number of hard examples
 - The annotator's labels and rationales are used to align an AI judge
   - The unaligned AI judge has minimal prompt instructions
   - The few-shot AI judge has a prompt with the annotator's rationales and labels
-    - The classifers' rationales are included in the alignment to provide important context [^1]
+    - The prompt also includes the classifers' rationales to provide a summary of differences between revisions
   - The heuristic AI judge has a prompt made by rewriting the rationales and labels in heuristic mode with an LLM
 - Evalulations are made on the unaligned and aligned AI judges
   - The test data is an independent set of hard examples with human annotations as ground truth
-- The process is iterated until satisfactory performance is reached
-- For each query, the level of agreement among the classifiers and judge is used as a confidence estimate
-
-[^1]: Why this is important:
-Classifiers' rationales include a summary of differences between revisions.
-This provides the judge with essential context that may be missing from the human annotators's rationale.
-By contrast, using the full revisions would bloat the alignment prompt with mostly irrelevant context (i.e. text that does not differ between revisions).
 
 ![Workflow for Noteworthy Differences AI system](image/workflow.png "Noteworthy Differences Workflow")
+
+After developing the initial heuristic alignment prompt, it is further refined in production through human feedback.
 
 ## Usage
 
@@ -49,17 +50,16 @@ By contrast, using the full revisions would bloat the alignment prompt with most
 
 ## AI alignment pipeline
 
-There are two phases: development and production.
-In the development phase, we create an initial alignment from human annotation.
-In the production phase, we fine-tune the alignment through user feedback.
+There are two stages: development and production.
+In the development stage, we create an initial alignment from human annotation.
+In the production stage, we fine-tune the alignment through user feedback.
 
 <details>
-<summary>Phase 1: development</summary>
+<summary>Stage 1: Development</summary>
 
-> [!NOTE]
-> All scripts and output files are in the `development` directory.
-> Run the pipeline with different Main Pages (step 1) to make the training and test sets.
-> Skip the Alignment step for evaluations with the test set.
+All scripts and output files are in the `development` directory (except for the first iteration of the heuristic alignment, which is saved under `production`).
+Run the pipeline with different Main Pages (step 1) to make the training and test sets.
+Skip the Alignment step for evaluations with the test set.
  
 1. **Initial preparation:** Run `get_titles.R` to extract and save the page titles linked from the Wikipedia Main Page to `wikipedia_titles.txt`.
 *This is optional; do this to use a newer set of page titles than the ones provided here.*
@@ -81,13 +81,34 @@ The results are saved to `AI_judgments_unaligned.csv`.
 
 6. **Alignment:** Run `align_judge.R` to collect the alignment data into `alignment_fewshot.txt`.
 The alignment text consist of True/False labels and rationales from the human annotator and rationales from the classifiers.
-A heuristic prompt created by rewriting the alignment text using an LLM is in `alignment_heuristic.txt`.
 
-7. **Evaluate:** Run `judge_disagreements.py --aligned` to run the aligned judge on the examples where the models disagree;
+7. **Evaluate:** Run `judge_disagreements.py --aligned-fewshot` to run the aligned judge on the examples where the models disagree;
 the results are saved to `AI_judgments_fewshot.csv`.
-Then run `summarize_results.R` to compute the summary statistics (results listed below).
 
-## Results
+8. **Rewrite alignment:**
+A heuristic prompt created by rewriting the alignment text using an LLM is in `production/alignment_1.txt`.
+Run `judge_disagreements.py --aligned-heuristic` to evaluate this judge.
+Then run `summarize_results.R` to compute the summary statistics for all judges (results listed below).
+
+</details>
+
+<details>
+<summary>Stage 2: Production</summary>
+
+All output files are in the `production` directory.
+
+- We start with an alignment prompt developed above; this is the first iteration (`alignment_1.txt`)
+- Collect user feedback on the hard examples (where confidence score is not High)
+- Hard examples can be found by using the "🎲 Special Random" button in the app
+- The app stores feedback in train/test split with a 60/40 ratio
+- The feedback is stored in a [Hugging Face Dataset](https://huggingface.co/datasets/jedick/noteworthy-differences-feedback)
+- Accumulate 30 train examples for each iteration of fine-tuning
+- Use `update_alignment.py` to update the heuristic alignment prompt with feedback examples
+- The new alignment prompt is saved as `alignment_{iteration}.txt` (iteration = 2, 3, 4, ...)
+
+</details>
+
+## Development Results
 
 | | Train samples | Test samples | Train accuracy | Test accuracy |
 | --- | --- | --- | --- | --- |
@@ -117,5 +138,3 @@ Then run `summarize_results.R` to compute the summary statistics (results listed
   - 7% improvement in train accuracy and 16% improvement in test accuracy
 - Accuracy scores are for the hard examples, not the entire dataset
   - Lower performance on test set may be due to concept drift (i.e., annotator fatigue)
-
-</details>
