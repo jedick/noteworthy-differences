@@ -3,6 +3,7 @@ from google import genai
 from dotenv import load_dotenv
 from retry_with_backoff import retry_with_backoff
 from prompts import update_prompt
+from evaluate import select_iteration
 import logfire
 
 # Load API keys
@@ -18,16 +19,24 @@ client = genai.Client()
 
 
 @logfire.instrument("Update alignment")
-def update_alignment():
+def update_alignment(iteration=None):
+    """
+    Update the alignment prompt using feedback collect from production app.
+
+    Args:
+        iteration: alignment iteration, starting with 2 (None uses most recent available iteration)
+    """
     # Load feedback dataset
-    dataset = load_dataset("jedick/noteworthy-differences-feedback")
+    dataset = load_dataset("jedick/noteworthy-differences-feedback", split="train")
     # Convert to DataFrame
-    df = dataset["train"].to_pandas()
-    # Remove samples with High confidence where feedback is "agree"
-    high_and_agree = (df["confidence_score"] == "High") & (df["feedback"] == "agree")
-    df = df.loc[~high_and_agree]
-    # Get 30 examples for training the LLM
-    examples = df[df.confidence_score != "High"].iloc[:30, :]
+    df = dataset.to_pandas()
+    # Get examples for this iteration
+    # This also gets the number of the most recent iteration if the argument is None
+    index, iteration = select_iteration(dataset, "train", iteration)
+    examples = df.iloc[index]
+    ## Remove samples with High confidence where feedback is "agree"
+    # high_and_agree = (df["confidence_score"] == "High") & (df["feedback"] == "agree")
+    # df = df.loc[~high_and_agree]
     examples_text = []
     # Loop over rows
     for index, row in df.iterrows():
@@ -47,7 +56,7 @@ def update_alignment():
     examples_text = "\n\n".join(examples_text)
 
     # Read the existing alignment
-    with open("production/alignment_1.txt", "r") as file:
+    with open(f"production/alignment_{str(iteration - 1)}.txt", "r") as file:
         lines = file.readlines()
         alignment_text = "".join(lines)
 
@@ -68,7 +77,7 @@ def update_alignment():
     # Get the response
     response = get_response()
     # Save to new alignment text file
-    with open("production/alignment_2.txt", "w") as file:
+    with open(f"production/alignment_{str(iteration)}.txt", "w") as file:
         file.write(response.text)
 
 

@@ -106,6 +106,11 @@ All output files are in the `production` directory.
 - Use `update_alignment.py` to update the heuristic alignment prompt with feedback examples
 - The new alignment prompt is saved as `alignment_{iteration}.txt` (iteration = 2, 3, 4, ...)
 
+For each alignment, we run evaluations on the current and all previous rounds of the test sets.
+
+- Run `evaluate()` in `evaluate.py` with the corresponding arguments for alignment round and evaluation round
+- The results are stored in `evaluations` and are visualized below
+
 </details>
 
 ## Development Results

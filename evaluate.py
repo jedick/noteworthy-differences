@@ -10,11 +10,52 @@ load_dotenv()
 # Setup logging with Logfire
 logfire.configure()
 
-# Define cutoff times for iterations
-cutoff_times = ["2025-12-19T13:49:55", "2025-12-20T07:25:12"]
+
+def select_iteration(dataset, split, iteration=None):
+    """
+    Select the production iteration for a given dataset and split.
+
+    Args:
+        dataset: Hugging Face dataset
+        split: train or test
+        iteration: iteration number (None for most recent)
+
+    Returns a tuple of (index, iteration) with the the indices of files in the iteration and the iteration used.
+    """
+    # Define production time spans for iterations
+    time_spans = [
+        # First iteration (development) has no time span
+        [None, None],
+        ["2025-12-19T13:29:42", "2025-12-20T07:25:12"],
+    ]
+    # If no iteration is specified, use the most recent one
+    if iteration is None:
+        iteration = len(time_spans)
+        print(f"Selected iteration {iteration}")
+    # Get file names
+    file_urls = list(dataset.info.download_checksums.keys())
+    file_names = [x.split("/data/")[1] for x in file_urls]
+    # Filter list using list comprehension
+    split_file_names = [x for x in file_names if f"{split}-" in x]
+    # Remove test- prefix and .json suffix
+    timestamps = [
+        x.replace(f"{split}-", "").replace(".json", "") for x in split_file_names
+    ]
+    # Convert to datetime object
+    dt_timestamps = [datetime.fromisoformat(x) for x in timestamps]
+    # Get time span for this iteration
+    time_span = time_spans[iteration - 1]
+    dt_cutoffs = [datetime.fromisoformat(x) for x in time_span]
+    # Get index of files that are between the cutoff times
+    index = [
+        i
+        for i, x in enumerate(dt_timestamps)
+        if x > dt_cutoffs[0] and x < dt_cutoffs[1]
+    ]
+    return index, iteration
 
 
-def get_evalset(iteration=1):
+def get_evalset(iteration=None):
     """
     Get the evalset for a given iteration.
 
@@ -22,6 +63,13 @@ def get_evalset(iteration=1):
         Tuple of (df, y) where df is a DataFrame with model input
         and y is a list of boolean with ground truth.
     """
+
+    dataset = None
+    index = None
+
+    if iteration is None:
+        dataset = load_dataset("jedick/noteworthy-differences-feedback", split="test")
+        index, iteration = select_iteration(dataset, "test", iteration)
 
     if iteration == 1:
         # For the 1st iteration we use development set (model disagreements on pages linked from the Wikipedia main page)
@@ -44,31 +92,16 @@ def get_evalset(iteration=1):
         # Return results
         return df, y
     else:
-        # For the 2nd and higher iterations we use production data (examples with user feedback)
-        # Load feedback dataset
-        dataset = load_dataset("jedick/noteworthy-differences-feedback", split="test")
+        if dataset is None:
+            # For the 2nd and higher iterations we use production data (examples with user feedback)
+            # Load feedback dataset
+            dataset = load_dataset(
+                "jedick/noteworthy-differences-feedback", split="test"
+            )
+            # Get indices of files in this iteration
+            index, _ = select_iteration(dataset, "test", iteration)
         # Convert to DataFrame
         df = dataset.to_pandas()
-        # Get file names
-        file_urls = list(dataset.info.download_checksums.keys())
-        file_names = [x.split("/data/")[1] for x in file_urls]
-        # Filter list using list comprehension
-        test_file_names = [x for x in file_names if "test-" in x]
-        # Remove test- prefix and .json suffix
-        timestamps = [
-            x.replace("test-", "").replace(".json", "") for x in test_file_names
-        ]
-        # Convert to datetime object
-        dt_timestamps = [datetime.fromisoformat(x) for x in timestamps]
-        # Get cutoff times for this iteration
-        cutoffs = cutoff_times[iteration - 2 : iteration]
-        dt_cutoffs = [datetime.fromisoformat(x) for x in cutoffs]
-        # Get index of files that are between the cutoff times
-        index = [
-            i
-            for i, x in enumerate(dt_timestamps)
-            if x > dt_cutoffs[0] and x < dt_cutoffs[1]
-        ]
         # Use only these examples
         df = df.iloc[index]
         # Construct y list (ground truth)
