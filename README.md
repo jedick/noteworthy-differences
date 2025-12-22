@@ -57,7 +57,7 @@ In the production stage, we fine-tune the alignment through user feedback.
 <details>
 <summary>Stage 1: Development</summary>
 
-All scripts and output files are in the `development` directory (except for the first iteration of the heuristic alignment, which is saved under `production`).
+All scripts and output files are in the `development` directory (except for the first round of the heuristic alignment, which is saved under `production`).
 Run the pipeline with different Main Pages (step 1) to make the training and test sets.
 Skip the Alignment step for evaluations with the test set.
  
@@ -97,14 +97,14 @@ Then run `summarize_results.R` to compute the summary statistics for all judges 
 
 All output files are in the `production` directory.
 
-- We start with an alignment prompt developed above; this is the first iteration (`alignment_1.txt`)
+- We start with an alignment prompt developed above; this is the first round (`alignment_1.txt`)
 - Collect user feedback on the hard examples (where confidence score is not High)
 - Hard examples can be found by using the "🎲 Special Random" button in the app
 - The app stores feedback in train/test split with a 60/40 ratio
 - The feedback is stored in a [Hugging Face Dataset](https://huggingface.co/datasets/jedick/noteworthy-differences-feedback)
-- Accumulate 30 train examples for each iteration of fine-tuning
+- Accumulate 30 train examples for each round of fine-tuning
 - Use `update_alignment.py` to update the heuristic alignment prompt with feedback examples
-- The new alignment prompt is saved as `alignment_{iteration}.txt` (iteration = 2, 3, 4, ...)
+- The new alignment prompt is saved as `alignment_{round}.txt` (round = 2, 3, 4, ...)
 
 For each alignment, we run evaluations on the current and all previous rounds of the test sets.
 

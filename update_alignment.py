@@ -3,7 +3,7 @@ from google import genai
 from dotenv import load_dotenv
 from retry_with_backoff import retry_with_backoff
 from prompts import update_prompt
-from evaluate import select_iteration
+from evaluate import select_round
 import logfire
 
 # Load API keys
@@ -19,20 +19,20 @@ client = genai.Client()
 
 
 @logfire.instrument("Update alignment")
-def update_alignment(iteration=None):
+def update_alignment(round=None):
     """
     Update the alignment prompt using feedback collect from production app.
 
     Args:
-        iteration: alignment iteration, starting with 2 (None uses most recent available iteration)
+        round: alignment round, starting with 2 (None uses most recent available round)
     """
     # Load feedback dataset
     dataset = load_dataset("jedick/noteworthy-differences-feedback", split="train")
     # Convert to DataFrame
     df = dataset.to_pandas()
-    # Get examples for this iteration
-    # This also gets the number of the most recent iteration if the argument is None
-    index, iteration = select_iteration(dataset, "train", iteration)
+    # Get examples for this round
+    # This also gets the number of the most recent round if the argument is None
+    index, round = select_round(dataset, "train", round)
     examples = df.iloc[index]
     ## Remove samples with High confidence where feedback is "agree"
     # high_and_agree = (df["confidence_score"] == "High") & (df["feedback"] == "agree")
@@ -56,7 +56,7 @@ def update_alignment(iteration=None):
     examples_text = "\n\n".join(examples_text)
 
     # Read the existing alignment
-    with open(f"production/alignment_{str(iteration - 1)}.txt", "r") as file:
+    with open(f"production/alignment_{str(round - 1)}.txt", "r") as file:
         lines = file.readlines()
         alignment_text = "".join(lines)
 
@@ -77,7 +77,7 @@ def update_alignment(iteration=None):
     # Get the response
     response = get_response()
     # Save to new alignment text file
-    with open(f"production/alignment_{str(iteration)}.txt", "w") as file:
+    with open(f"production/alignment_{str(round)}.txt", "w") as file:
         file.write(response.text)
 
 
