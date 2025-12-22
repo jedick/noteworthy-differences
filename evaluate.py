@@ -113,7 +113,7 @@ def get_evalset(round=None):
         return df, y
 
 
-def evaluate(e_round=1, a_round=1):
+def evaluate(e_round=1, a_round=1, rep=1):
     """
     Run evaluation for a given evalset and alignment prompt.
 
@@ -130,12 +130,12 @@ def evaluate(e_round=1, a_round=1):
         Saves results in 'evals/evalset_{e_round}_alignment_{a_round}.csv'.
     """
 
-    span_name = f"Run evaluation (evalset {e_round}, alignment {a_round})"
+    span_name = f"Evalset {e_round}, alignment {a_round}"
     with logfire.span(span_name):
         # Select judge mode
         judge_mode = "unaligned" if a_round == 0 else "aligned-heuristic"
         # Define output file
-        outfile = f"evaluations/evalset_{e_round}_alignment_{a_round}.csv"
+        outfile = f"evaluations/evalset_{e_round}_alignment_{a_round}_rep_{rep}.csv"
         print(f"Saving evaluation results to {outfile}")
         # Get evalset and ground truth
         df, y = get_evalset(e_round)

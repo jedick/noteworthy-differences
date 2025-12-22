@@ -108,7 +108,10 @@ All output files are in the `production` directory.
 
 For each alignment, we run evaluations on the current and all previous rounds of the test sets.
 
-- Run `evaluate()` in `evaluate.py` with the corresponding arguments for alignment round and evaluation round
+- Run `evaluate()` in `evaluate.py` with the corresponding arguments:
+  - evalset (1 is development, 2+ is production)
+  - alignment round (0 is unaligned, 1 is development, 2+ is production)
+  - evaluation rep (we take the average of 3 repetitions)
 - The results are stored in `evaluations` and are visualized below
 
 </details>

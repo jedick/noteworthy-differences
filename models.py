@@ -26,9 +26,9 @@ logfire.instrument_google_genai()
 client = genai.Client()
 
 
-def get_latest_iteration():
+def get_latest_round():
     """
-    Find the latest iteration number from alignment files in the production directory.
+    Find the latest round number from alignment files in the production directory.
     Returns the highest numeric suffix from files matching alignment_*.txt pattern.
     """
     pattern = "production/alignment_*.txt"
@@ -37,18 +37,18 @@ def get_latest_iteration():
     if not files:
         raise FileNotFoundError(f"No alignment files found matching pattern: {pattern}")
 
-    max_iteration = 0
+    max_round = 0
     for file in files:
         # Extract numeric suffix from filename (e.g., "alignment_2.txt" -> 2)
         match = re.search(r"alignment_(\d+)\.txt$", file)
         if match:
-            iteration = int(match.group(1))
-            max_iteration = max(max_iteration, iteration)
+            round = int(match.group(1))
+            max_round = max(max_round, round)
 
-    if max_iteration == 0:
-        raise ValueError("No valid iteration numbers found in alignment files")
+    if max_round == 0:
+        raise ValueError("No valid round numbers found in alignment files")
 
-    return max_iteration
+    return max_round
 
 
 @retry_with_backoff()
@@ -102,7 +102,7 @@ def judge(
     rationale_1,
     rationale_2,
     mode="aligned-heuristic",
-    iteration=None,
+    round=None,
 ):
     """
     AI judge to settle disagreements between classification models
@@ -113,7 +113,7 @@ def judge(
         rationale_1: Rationale provided by model 1 (i.e., heuristic prompt)
         rationale_2: Rationale provided by model 2 (i.e., few-shot prompt)
         mode: Prompt mode: unaligned, aligned-fewshot, or aligned-heuristic
-        iteration: Iteration to use for heuristic alignment (None for latest)
+        round: Round to use for heuristic alignment (None for latest)
 
     Returns:
         noteworthy: True if the differences are noteworthy; False if not
@@ -138,10 +138,10 @@ def judge(
             lines = file.readlines()
             alignment_text = "".join(lines)
     elif mode == "aligned-heuristic":
-        # Use latest iteration if iteration is None
-        if iteration is None:
-            iteration = get_latest_iteration()
-        with open(f"production/alignment_{str(iteration)}.txt", "r") as file:
+        # Use latest round if round is None
+        if round is None:
+            round = get_latest_round()
+        with open(f"production/alignment_{str(round)}.txt", "r") as file:
             lines = file.readlines()
             alignment_text = "".join(lines)
     else:
