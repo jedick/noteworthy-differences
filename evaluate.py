@@ -27,11 +27,15 @@ def select_round(dataset, split, round=None):
         # First round (development) has no time span
         [None, None],
         ["2025-12-19T13:29:42", "2025-12-20T07:25:12"],
+        ["2025-12-23T01:20:55", "2025-12-23T06:39:43"],
     ]
     # If no round is specified, use the most recent one
     if round is None:
         round = len(time_spans)
         print(f"Selected round {round}")
+    # Return None for non-production round
+    if round < 2:
+        return None
     # Get file names
     file_urls = list(dataset.info.download_checksums.keys())
     file_names = [x.split("/data/")[1] for x in file_urls]
@@ -105,6 +109,8 @@ def get_evalset(round=None):
         df = dataset.to_pandas()
         # Use only these examples
         df = df.iloc[index]
+        # Reset the index after subsetting
+        df.reset_index(drop=True, inplace=True)
         # Construct y list (ground truth)
         judge = list(df["judge_noteworthy"])
         feedback = list(df["feedback"])
