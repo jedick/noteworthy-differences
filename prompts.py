@@ -91,20 +91,20 @@ Return a JSON-formatted response with keys for:
 """
 
 update_prompt = """
-You are fine-tuning an AI system for detecting noteworthy differences between Wikipedia article revisions.
-The system has two classifier models and an AI judge.
-The alignment text for the judge is provided below.
-Please update this alignment text based on the example text.
-The example text contains the models' responses as well as human feedback.
-You should change, remove or add alignment text wherever needed to make it consistent with the human feedback.
-The new alignment text should provide guidance to an LLM to make the correct choice on unseen examples.
-Respond only with an updated alignment text.
+You are updating an AI system for detecting noteworthy differences between Wikipedia article revisions.
+The AI judge has alignment text that may have become ineffective due to concept drift.
+Please update the alignment text based on the feedback data.
+Be willing to make major changes (including deletions) to the text to align with the human feedback.
+The new alignment text should provide detailed heuristics to allow an LLM to correctly classify unseen examples.
+Base the new alignment only on the feedback data and not your own ideas of human preferences.
+Furthermore, make the alignment reflect the overall frequency of human True/False classifications in the feedback.
+Respond only with the updated alignment text.
 
 <alignment_text>
 {{alignment_text}}
 </alignment_text>
 
-<examples_text>
-{{examples_text}}
-</examples_text>
+<feedback_data>
+{{feedback_data}}
+</feedback_data>
 """

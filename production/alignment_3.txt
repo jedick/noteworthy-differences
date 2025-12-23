@@ -1,0 +1,53 @@
+## Noteworthy Changes (True)
+
+Changes are noteworthy if they introduce new, essential factual information or significantly alter the understanding, scope, or accuracy of the article's core subject.
+
+*   **Addition or Correction of Core Factual Data:**
+    *   Adding specific biographical details such as cause of death or specific location of death (city/state) when previously absent or only generally described.
+    *   Adding specific honors, awards, or significant recognitions, along with their dates, for an individual.
+    *   Correcting specific biographical dates (e.g., birth/death years, specific event years), even if the numerical change is minor, provided it improves factual accuracy.
+    *   Adding or correcting specific causes or primary contributing factors for events or phenomena.
+    *   Adding specific professional roles, contributions, or achievements for individuals (e.g., an actor's specific character in a production, a religious leader's specific denomination).
+    *   Adding marital status for historically significant figures where the spouse also held prominence, indicating a significant relationship.
+    *   Adding entirely new and significant political, ideological, or philosophical stances/affiliations for public figures.
+    *   Providing significantly more precise and comprehensive descriptions of a person's primary profession, area of expertise, or artistic practice.
+    *   Correcting core biographical facts (e.g., political affiliation) based on new scholarly consensus or confirmed evidence.
+
+*   **Changes to Identity, Scope, or Definition:**
+    *   Updating or correcting official primary names for countries, organizations, or other entities due to rebranding or international recognition.
+    *   Changes that significantly broaden the scope, scale, or importance of an entity or event (e.g., changing a "tournament" to a "national tournament").
+    *   Adding primary or indigenous language names for places or people, especially when previously omitted.
+    *   Expanding definitions or lists to include a truly new, distinct category or fundamental variation of the subject, significantly broadening the article's scope (e.g., adding 'electric cars' to a list that previously only had internal combustion and hybrid).
+    *   Correcting or significantly refining the temporal period for major historical or cultural movements/events (e.g., changing '19th century' to 'early 20th century').
+
+*   **Removal of Significant Incorrect Information:**
+    *   Removing significant, factually incorrect content, such as entire sections, misattributed information (e.g., quotes, achievements), or content about the wrong subject.
+
+## Not Noteworthy Changes (False)
+
+Changes are not noteworthy if they are purely stylistic, minor elaborations, rephrasing, formatting adjustments, or introduce details that are already implicitly understood or do not alter the core factual content or understanding of the article.
+
+*   **Minor Edits and Formatting:**
+    *   Correcting minor typos, spelling errors of common words, or punctuation mistakes where the intended meaning was always clear and no factual error was introduced.
+    *   Purely stylistic rephrasing, grammar adjustments, or minor structural reorganization that does not alter the core factual content or meaning of the text.
+    *   Reordering items within lists, sections, or paragraphs without altering their content, meaning, or hierarchy.
+    *   Administrative changes such as adding standard templates for external links or categories, or other formatting adjustments that do not introduce new factual content.
+    *   Minor adjustments to internal hyperlinks (e.g., linking to a more specific section within the same article or a closely related one) that do not alter the linked text or its fundamental relevance.
+    *   Removing obsolete, redundant, or superfluous reference citations that do not impact the factual content or verifiability of the surrounding text.
+
+*   **Minor Detail Additions or Refinements:**
+    *   Adding more granular geographic detail (e.g., county within a state/country, sub-district within a district) when the broader region is already specified and the added detail does not introduce new essential context.
+    *   Adding subtitles, taglines, or alternative *secondary* identifiers for media or entities when the primary identifier is already well-known and the addition does not introduce new core content.
+    *   Adding common honorifics, suffixes (e.g., 'Jr.', 'Sr.'), or minor conventional titles that do not clarify fundamental identity or introduce new factual information if already generally understood.
+    *   Adding minor, uncritical quotes or brief elaborations that reiterate an already stated fact or opinion without introducing new information, perspective, or core insight.
+    *   Adding precise day and month to an event already dated by year, if it does not fundamentally alter the understanding of the event's timing, sequence, or historical context.
+    *   Adding an item to an *already extensive and general list* where the added item is well-known and fits the existing scope, without introducing a new distinct category or significantly expanding the list's foundational definition.
+    *   Adding minor descriptive or technical details that elaborate on an already defined characteristic or concept, without changing its primary understanding, classification, or core nature (e.g., a minor architectural detail when the primary style is known).
+    *   Adding purely descriptive, non-essential details about physical appearance, unless directly relevant to the subject's achievements, significance, or identity.
+
+*   **Synonymous or Implicitly Understood Changes:**
+    *   Swapping synonyms or making minor word choice refinements that do not change the fundamental meaning, objective scale, or tone (e.g., 'large' to 'significant', 'former' to 'retired', 'United States of America' to 'USA').
+    *   Generalizing a specific location (e.g., city to country) when the broader location is already implicitly understood or contextually more relevant, and no new specific insight is provided by the more general term.
+
+*   **Minor Statistical Updates:**
+    *   Minor statistical updates for ongoing trends (e.g., population, rankings) that fall within expected variation or a short temporal gap (e.g., 5 years or less), and do not represent a significant change in magnitude or implication.

@@ -34,23 +34,18 @@ def update_alignment(round=None):
     # This also gets the number of the most recent round if the argument is None
     index, round = select_round(dataset, "train", round)
     examples = df.iloc[index]
-    ## Remove samples with High confidence where feedback is "agree"
-    # high_and_agree = (df["confidence_score"] == "High") & (df["feedback"] == "agree")
-    # df = df.loc[~high_and_agree]
     examples_text = []
     # Loop over rows
-    for index, row in df.iterrows():
+    for index, row in examples.iterrows():
         # Construct training text for this row
-        noteworthy = "not noteworthy differences"
+        ground_truth = "noteworthy=False"
         if row["judge_noteworthy"] and row["feedback"] == "agree":
-            noteworthy = "noteworthy differences"
+            ground_truth = "noteworthy=True"
         if not row["judge_noteworthy"] and row["feedback"] == "disagree":
-            noteworthy = "noteworthy differences"
-        heuristic = f"Model 1: {row['heuristic_rationale']}"
-        fewshot = f"Model 2: {row['fewshot_rationale']}"
+            ground_truth = "noteworthy=True"
         judge = f"AI Judge: {row['judge_reasoning']}"
-        human = f"Human feedback: {row['feedback']}"
-        row_text = f"{heuristic}\n{fewshot}\n{judge}\n{human} ({noteworthy})."
+        human = f"Human feedback: {row['feedback']} ({ground_truth})."
+        row_text = f"{judge} {human}"
         examples_text.append(row_text)
 
     examples_text = "\n\n".join(examples_text)
