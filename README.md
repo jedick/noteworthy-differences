@@ -146,3 +146,12 @@ For each alignment, we run evaluations on the current and all previous rounds of
   - 7% improvement in train accuracy and 16% improvement in test accuracy
 - Accuracy scores are for the hard examples, not the entire dataset
   - Lower performance on test set may be due to concept drift (i.e., annotator fatigue)
+
+## Production Results
+
+Model accuracy (difference from baseline unaligned judge) for different combinations of evaluation sets and alignments:
+
+<div align="left">
+  <img src="image/eval-accuracy.png" alt="Model accuracy for different combination of evaluation sets and alignments" style="width:50%;"/>
+</div>
+
