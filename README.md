@@ -132,7 +132,8 @@ For each alignment, we run evaluations on the current and all previous rounds of
 | &emsp;&emsp;Few-shot AI judge | 18 | 16 | 92% | 47% |
 | &emsp;&emsp;Heuristic AI judge | 23 | 15 | 65% | 53% |
 
-### Discussion
+<details>
+<summary>Discussion</summary>
 
 - The few-shot and heuristic classifiers agree on most classifications (ca. 90%)
 - For revisions where the classifiers disagree ("hard examples"):
@@ -147,11 +148,24 @@ For each alignment, we run evaluations on the current and all previous rounds of
 - Accuracy scores are for the hard examples, not the entire dataset
   - Lower performance on test set may be due to concept drift (i.e., annotator fatigue)
 
+</details>
+
 ## Production Results
 
-Model accuracy (difference from baseline unaligned judge) for different combinations of evaluation sets and alignments:
+Production data were produced by a single user intentionally changing the frequency of noteworthy classifications through time.
+We can see the results in the following visualization of concept drift.
+Over time, more revisions are labeled as not noteworthy by the human.
+Because the baseline model (unaligned AI judge) tends to classify most revisions as noteworthy, its performance becomes progressively worse.
 
 <div align="left">
-  <img src="image/eval-accuracy.png" alt="Model accuracy for different combination of evaluation sets and alignments" style="width:50%;"/>
+  <img src="image/concept-drift.png" alt="Concept drift visualization showing that over time, more revisions are labeled as not noteworthy" style="width:60%;"/>
+</div>
+
+The next plot show model accuracy (difference from the baseline unaligned judge) for different combinations of evaluation sets and alignments.
+The judge aligned once in development actually performs worse than the baseline model during production.
+Realignment during production is needed to keep the deployed model more performant than the baseline.
+
+<div align="left">
+  <img src="image/eval-accuracy.png" alt="Model accuracy for different combination of evaluation sets and alignments" style="width:60%;"/>
 </div>
 
