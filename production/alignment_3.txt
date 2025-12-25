@@ -1,53 +1,53 @@
 ## Noteworthy Changes (True)
 
-Changes are noteworthy if they introduce new, essential factual information or significantly alter the understanding, scope, or accuracy of the article's core subject.
+These changes introduce essential, previously unstated, or fundamentally altered information that directly impacts the core identity, primary function, or crucial biographical/historical understanding of the subject. Such changes are considerably less frequent than "Not Noteworthy" changes.
 
-*   **Addition or Correction of Core Factual Data:**
-    *   Adding specific biographical details such as cause of death or specific location of death (city/state) when previously absent or only generally described.
-    *   Adding specific honors, awards, or significant recognitions, along with their dates, for an individual.
-    *   Correcting specific biographical dates (e.g., birth/death years, specific event years), even if the numerical change is minor, provided it improves factual accuracy.
-    *   Adding or correcting specific causes or primary contributing factors for events or phenomena.
-    *   Adding specific professional roles, contributions, or achievements for individuals (e.g., an actor's specific character in a production, a religious leader's specific denomination).
-    *   Adding marital status for historically significant figures where the spouse also held prominence, indicating a significant relationship.
-    *   Adding entirely new and significant political, ideological, or philosophical stances/affiliations for public figures.
-    *   Providing significantly more precise and comprehensive descriptions of a person's primary profession, area of expertise, or artistic practice.
-    *   Correcting core biographical facts (e.g., political affiliation) based on new scholarly consensus or confirmed evidence.
-
-*   **Changes to Identity, Scope, or Definition:**
-    *   Updating or correcting official primary names for countries, organizations, or other entities due to rebranding or international recognition.
-    *   Changes that significantly broaden the scope, scale, or importance of an entity or event (e.g., changing a "tournament" to a "national tournament").
-    *   Adding primary or indigenous language names for places or people, especially when previously omitted.
-    *   Expanding definitions or lists to include a truly new, distinct category or fundamental variation of the subject, significantly broadening the article's scope (e.g., adding 'electric cars' to a list that previously only had internal combustion and hybrid).
-    *   Correcting or significantly refining the temporal period for major historical or cultural movements/events (e.g., changing '19th century' to 'early 20th century').
-
-*   **Removal of Significant Incorrect Information:**
-    *   Removing significant, factually incorrect content, such as entire sections, misattributed information (e.g., quotes, achievements), or content about the wrong subject.
+*   **Core Factual Additions for Individuals:**
+    *   Adding significant biographical details such as nationality, a significant previously unstated occupation (e.g., 'barrister'), specific physical attributes (e.g., height), or crucial career statistics (e.g., matches played).
+    *   Adding precise birth and death dates (month and day) when only the year was previously stated.
+    *   Adding specific publication years for a person's works.
+    *   Adding significant biographical details about a person's major achievements or financial standing (e.g., "made a fortune with X company").
+    *   Updating a person's current status that reflects a fundamental change in their role (e.g., from 'footballer' to 'former footballer') or adding a crucial detail like a specific playing position.
+*   **Core Factual Additions for Entities/Concepts:**
+    *   Adding primary, widely recognized identifiers that significantly enhance utility (e.g., an airport's IATA code).
+    *   Adding crucial linguistic context, surname variations, or archaic spellings that fundamentally expand the core definition of a term or name.
+    *   Adding significant factual information about a group's accomplishments or historical impact (e.g., specific policies, social spending, poverty reduction).
+    *   Adding significant contextual information about a work's themes, purpose, or fundamental significance (e.g., its status as a debut film, core thematic elements).
+    *   Adding practical information (e.g., explicit time zone explanations, formatting conventions for schedules) that significantly enhances the interpretability or usability of core data.
+*   **Core Factual Corrections & Clarifications:**
+    *   Correcting or clarifying specific names of historical bodies to improve factual accuracy at a fundamental level (e.g., "Constituent Assembly" to "National Constituent Assembly").
+*   **Significant Removals:**
+    *   Removal of a widely used common name for a subject (even if a scientific or primary identifier remains).
+    *   Removal of specific historical data (e.g., an entity's IOC country code, number of appearances in an event, or debut year).
 
 ## Not Noteworthy Changes (False)
 
-Changes are not noteworthy if they are purely stylistic, minor elaborations, rephrasing, formatting adjustments, or introduce details that are already implicitly understood or do not alter the core factual content or understanding of the article.
+These changes are typically minor stylistic adjustments, rephrasing, additions of easily inferable or minor contextual details, or information that, while adding depth, does not alter the fundamental understanding or core identity of the subject. This category represents the majority (approximately 69%) of revisions according to human preferences.
 
-*   **Minor Edits and Formatting:**
-    *   Correcting minor typos, spelling errors of common words, or punctuation mistakes where the intended meaning was always clear and no factual error was introduced.
-    *   Purely stylistic rephrasing, grammar adjustments, or minor structural reorganization that does not alter the core factual content or meaning of the text.
-    *   Reordering items within lists, sections, or paragraphs without altering their content, meaning, or hierarchy.
-    *   Administrative changes such as adding standard templates for external links or categories, or other formatting adjustments that do not introduce new factual content.
-    *   Minor adjustments to internal hyperlinks (e.g., linking to a more specific section within the same article or a closely related one) that do not alter the linked text or its fundamental relevance.
-    *   Removing obsolete, redundant, or superfluous reference citations that do not impact the factual content or verifiability of the surrounding text.
-
-*   **Minor Detail Additions or Refinements:**
-    *   Adding more granular geographic detail (e.g., county within a state/country, sub-district within a district) when the broader region is already specified and the added detail does not introduce new essential context.
-    *   Adding subtitles, taglines, or alternative *secondary* identifiers for media or entities when the primary identifier is already well-known and the addition does not introduce new core content.
-    *   Adding common honorifics, suffixes (e.g., 'Jr.', 'Sr.'), or minor conventional titles that do not clarify fundamental identity or introduce new factual information if already generally understood.
-    *   Adding minor, uncritical quotes or brief elaborations that reiterate an already stated fact or opinion without introducing new information, perspective, or core insight.
-    *   Adding precise day and month to an event already dated by year, if it does not fundamentally alter the understanding of the event's timing, sequence, or historical context.
-    *   Adding an item to an *already extensive and general list* where the added item is well-known and fits the existing scope, without introducing a new distinct category or significantly expanding the list's foundational definition.
-    *   Adding minor descriptive or technical details that elaborate on an already defined characteristic or concept, without changing its primary understanding, classification, or core nature (e.g., a minor architectural detail when the primary style is known).
-    *   Adding purely descriptive, non-essential details about physical appearance, unless directly relevant to the subject's achievements, significance, or identity.
-
-*   **Synonymous or Implicitly Understood Changes:**
-    *   Swapping synonyms or making minor word choice refinements that do not change the fundamental meaning, objective scale, or tone (e.g., 'large' to 'significant', 'former' to 'retired', 'United States of America' to 'USA').
-    *   Generalizing a specific location (e.g., city to country) when the broader location is already implicitly understood or contextually more relevant, and no new specific insight is provided by the more general term.
-
-*   **Minor Statistical Updates:**
-    *   Minor statistical updates for ongoing trends (e.g., population, rankings) that fall within expected variation or a short temporal gap (e.g., 5 years or less), and do not represent a significant change in magnitude or implication.
+*   **Minor Details & Rephrasing:**
+    *   Minor stylistic corrections, grammar adjustments, capitalization changes, or punctuation changes.
+    *   Rephrasing, structural reorganization, or moving content that does not introduce new fundamental information or alter the core meaning.
+    *   Adding specific examples, anecdotes, or detailed explanations that deepen understanding but do not change the fundamental nature or core conclusion of a concept or definition.
+    *   Removing an adjective that describes an achievement (e.g., "award-winning").
+    *   Removing a specific detail about literary output if the core biographical details remain largely intact (e.g., "never yet a novel").
+    *   Removing an alternative name or specific sub-location detail (e.g., county) if the primary identifier and broader location (city, state) are still present.
+    *   Removing alternative spellings from a disambiguation page.
+    *   Adding or removing specific duration details for episodes or minor formatting elements of a series description.
+    *   Adding related names for context that do not fundamentally alter the definition or core identity of the primary subject.
+*   **Inferable Information & Minor Specificity:**
+    *   Adding information that is highly inferable or readily implied from existing text or context (e.g., adding "of the Union" when context is American Civil War, or "United States" when "West Virginia" is mentioned).
+    *   Adding minor geographical specificity (e.g., a sub-district within a district) or a fuller competition name that is implicitly understood or a minor detail.
+    *   Adding specific tenure dates when the start and end dates are already explicitly stated or easily inferable elsewhere in the article.
+*   **Cultural & Linguistic Information (Generally False):**
+    *   Adding any form of pronunciation (e.g., IPA, romanization, Latin American Spanish pronunciation).
+    *   Adding names or scripts in indigenous, native, or other foreign languages (e.g., Hebrew script, Chinese characters, Persian name, Hungarian name) or their literal translations.
+    *   Adding alternative official names (e.g., "Banqiao Night Market", common English name for a building, scientific binomial name in Latin) for places, entities, or concepts.
+    *   Fixing broken language templates or clarifying official names/abbreviations (e.g., political party names) unless it involves a *core factual correction of a historical body's name* (which is noteworthy).
+*   **Corrections & Updates (Generally False):**
+    *   Correction of units for a quantifiable trait (e.g., 'cm' to 'mm').
+    *   Adding fundamental biological characteristics (e.g., "diurnal" activity pattern).
+    *   Adding record-breaking characteristics or superlatives (e.g., "largest member of X family").
+    *   Direct factual correction of a major collaborating institution's name or expansion of an institution's stated scope.
+*   **Administrative & Format Changes:**
+    *   Replacing templates with equivalent content, changing abbreviations, or repositioning references without altering factual content or meaning.
+    *   Minor formatting adjustments (e.g., hyphens, spaces in date ranges) that do not alter factual content or meaning.
