@@ -152,20 +152,16 @@ For each alignment, we run evaluations on the current and all previous rounds of
 
 ## Production Results
 
-Production data were produced by a single user intentionally changing the frequency of noteworthy classifications through time.
-We can see the results in the following visualization of concept drift.
-Over time, more revisions are labeled as not noteworthy by the human.
-Because the baseline model (unaligned AI judge) tends to classify most revisions as noteworthy, its performance becomes progressively worse.
+User feedback was gathered for the deployed model.
+Over time, more revisions were labeled as not noteworthy in the user feedback.
+
+The judge that was aligned during development (time step 1) but not realigned during production tends to classify most revisions as noteworthy.
+The performance of this judge fluctuates along with the change in label distribution.
+
+Continuous realignment during production improves the judge's accuracy by a large margin.
+This demonstrates a workable approach to mitigate the effects of concept drift.
 
 <div align="left">
-  <img src="image/concept-drift.png" alt="Concept drift visualization showing that over time, more revisions are labeled as not noteworthy" style="width:60%;"/>
-</div>
-
-The next plot show model accuracy (difference from the baseline unaligned judge) for different combinations of evaluation sets and alignments.
-The judge aligned once in development actually performs worse than the baseline model during production.
-Realignment during production is needed to keep the deployed model more performant than the baseline.
-
-<div align="left">
-  <img src="image/eval-accuracy.png" alt="Model accuracy for different combination of evaluation sets and alignments" style="width:60%;"/>
+  <img src="image/eval-accuracy.png" alt="Model accuracy for different combination of evaluation sets and alignments" style="width:70%;"/>
 </div>
 

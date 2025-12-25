@@ -28,7 +28,7 @@ def select_round(dataset, split, round=None):
         [None, None],
         ["2025-12-19T13:29:42", "2025-12-20T07:25:12"],
         ["2025-12-23T01:20:55", "2025-12-23T06:39:43"],
-        ["2025-12-24T01:45:17", "2025-12-24T13:58:13"],
+        ["2025-12-25T03:46:46", "2025-12-25T07:38:35"],
     ]
     # If no round is specified, use the most recent one
     if round is None:

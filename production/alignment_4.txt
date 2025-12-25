@@ -1,0 +1,72 @@
+## Noteworthy Changes (True)
+
+These changes introduce fundamentally essential, previously unstated, or critically altered information that directly impacts the core identity, primary function, or crucial biographical/historical understanding of a *person* or *work*. Such changes are *extremely rare*, representing approximately 14% of revisions according to human preferences.
+
+*   **Fundamental Biographical Details for Individuals:**
+    *   Adding a specific playing position for an individual (e.g., a footballer's specific position).
+    *   Adding a precise birth date for an individual (month and day, where only the year was previously stated).
+    *   Adding a precise death date for an individual (month and day, where only the year was previously stated).
+*   **Fundamental Status Updates:**
+    *   Updating an entity's or individual's fundamental status (e.g., a film changing from "upcoming" to "was theatrically released"; a person's role changing from 'footballer' to 'former footballer').
+*   **Core Understanding of a Work:**
+    *   Adding significant contextual information about a *work's* fundamental themes or purpose (e.g., a book's specific purpose and theme).
+
+## Not Noteworthy Changes (False)
+
+These changes are typically minor stylistic adjustments, rephrasing, additions of easily inferable or minor contextual details, or information that, while adding depth, does not alter the fundamental understanding, core identity, or crucial biographical information of the subject. This category represents the vast majority (approximately 86%) of revisions according to human preferences.
+
+*   **Minor Stylistic, Grammar, or Formatting Adjustments:**
+    *   Minor stylistic corrections, grammar adjustments, capitalization changes, or punctuation changes.
+    *   Rephrasing, structural reorganization, or moving content that does not introduce new fundamental information or alter the core meaning.
+    *   Fixing broken language templates or clarifying official names/abbreviations.
+    *   Changes in distance formatting, units, or adding metric equivalents.
+    *   Correction of units for a quantifiable trait (e.g., 'cm' to 'mm').
+    *   Correcting placeholder text or minor formatting elements.
+    *   Replacing templates with equivalent content, changing abbreviations, or repositioning references without altering factual content or meaning.
+    *   Minor formatting adjustments (e.g., hyphens, spaces in date ranges).
+*   **Linguistic, Cultural, and Etymological Details:**
+    *   Adding or removing names, scripts, or characters in indigenous, native, or other foreign languages (e.g., Hebrew script, Chinese characters, Persian name, Hungarian name) or their literal translations.
+    *   Adding any form of pronunciation (e.g., IPA, romanization, Latin American Spanish pronunciation).
+    *   Adding alternative official or common names for places, entities, or concepts (e.g., "Banqiao Night Market", common English name for a building, scientific binomial name in Latin, Italian title for a sculpture).
+    *   Adding etymological explanations or linguistic context.
+    *   Adding full romanized names when a shorter form is present.
+*   **Minor Geographical, Locational, or Identifying Specificity:**
+    *   Adding minor geographical specificity (e.g., a sub-district within a district, specific river banks, broader regional context within a known area).
+    *   Adding or removing specific routes, roads, or less prominent geographical identifiers (e.g., U.S. Route 50).
+    *   Adding specific sub-location details (e.g., county) if the primary identifier and broader location (city, state) are still present.
+    *   Adding precise dates for *events or accidents* (month and day, where only the year was previously stated).
+*   **Details about Individuals (beyond strict 'True' criteria):**
+    *   Adding a single additional profession for an individual (e.g., 'comedian').
+    *   Adding the number of books authored or specific editorial roles (e.g., 'founding editor').
+    *   Adding a previously unstated maternal grandfather's name or a middle name if the primary name is already present.
+    *   Refining terminology for ethnicity or identity (e.g., 'American Indian woman Lakota' to 'Lakota woman' and 'Indian' to 'Native').
+    *   Adding biographical details such as nationality, specific physical attributes (e.g., height), or general career statistics (e.g., matches played) that do not fundamentally alter core identity.
+*   **Detailed or Expanded Information (without fundamental change):**
+    *   Adding specific examples, anecdotes, or detailed explanations that deepen understanding but do not change the fundamental nature or core conclusion of a concept or definition.
+    *   Adding information that is highly inferable or readily implied from existing text or context.
+    *   Adding minor example devices or specific qualifications about effectiveness.
+    *   Adding fundamental biological characteristics (e.g., "diurnal" activity pattern).
+    *   Adding record-breaking characteristics or superlatives (e.g., "largest member of X family").
+    *   Adding hydrological data (e.g., basin area) or clarifying downstream connections to other entities.
+    *   Clarifying distinctions between related concepts (e.g., tax exclusion, tax deduction vs. tax exemption).
+    *   Adding specific breed names or clarifying primary types for animals (e.g., "Tulim", "beef cattle breed").
+    *   Expanding an institution's stated scope or mentioning a major collaborating institution.
+    *   Adding information about a group's accomplishments or historical impact (e.g., specific policies, social spending, poverty reduction) if it does not fundamentally alter the primary understanding of the group's core identity.
+    *   Adding details such as specific flowering times, an extra access point for a location, or specific duration details for episodes.
+*   **Removals:**
+    *   Removing an adjective that describes an achievement (e.g., "award-winning").
+    *   Removing a specific detail about literary output if the core biographical details remain largely intact (e.g., "never yet a novel", initial book title).
+    *   Removing an alternative name, alternative spelling, or specific sub-location detail (e.g., county) if the primary identifier and broader location (city, state) are still present.
+    *   Removing specific taxonomic clades if the core family classification remains present.
+    *   Removing authors of a foreword or afterword.
+    *   Removing specific practical, operational, or contextual information (e.g., postal services details, operational details of a railway, career length).
+*   **Corrections and Clarifications (unless they fit strict 'True' criteria):**
+    *   Correction or clarification of an individual's specific political party affiliation (e.g., 'conservative' to 'Progressive Conservative').
+    *   Correction or clarification of the full name of a historical political body or an event's official title (e.g., 'Constituent Assembly' to 'National Constituent Assembly', '8th World Badminton Championships' to '1993 IBF World Championships').
+    *   Changing the primary name or identifier of an individual (e.g., 'Ivane I' to 'John I').
+    *   More precise description of victims or adding specific significant elements of a scandal (e.g., 'underage women' to 'children and girls', 'client list').
+    *   Direct factual correction of a major collaborating institution's name.
+*   **Administrative & Utility-focused additions:**
+    *   Adding 'citation needed' tags or similar administrative notes.
+    *   Adding related names for context that do not fundamentally alter the definition or core identity of the primary subject.
+    *   Adding a passenger figure that quantifies an already established characteristic (e.g., low usage).
