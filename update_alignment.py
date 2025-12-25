@@ -34,7 +34,7 @@ def update_alignment(round=None):
     # This also gets the number of the most recent round if the argument is None
     index, round = select_round(dataset, "train", round)
     examples = df.iloc[index]
-    examples_text = []
+    feedback_data = []
     # Loop over rows
     for index, row in examples.iterrows():
         # Construct training text for this row
@@ -46,9 +46,9 @@ def update_alignment(round=None):
         judge = f"AI Judge: {row['judge_reasoning']}"
         human = f"Human feedback: {row['feedback']} ({ground_truth})."
         row_text = f"{judge} {human}"
-        examples_text.append(row_text)
+        feedback_data.append(row_text)
 
-    examples_text = "\n\n".join(examples_text)
+    feedback_data = "\n\n".join(feedback_data)
 
     # Read the existing alignment
     with open(f"production/alignment_{str(round - 1)}.txt", "r") as file:
@@ -57,7 +57,7 @@ def update_alignment(round=None):
 
     # Write prompt to update alignment
     prompt = update_prompt.replace("{{alignment_text}}", alignment_text).replace(
-        "{{examples_text}}", examples_text
+        "{{feedback_data}}", feedback_data
     )
 
     # Function to generate response

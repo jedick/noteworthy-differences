@@ -28,6 +28,7 @@ def select_round(dataset, split, round=None):
         [None, None],
         ["2025-12-19T13:29:42", "2025-12-20T07:25:12"],
         ["2025-12-23T01:20:55", "2025-12-23T06:39:43"],
+        ["2025-12-24T01:45:17", "2025-12-24T13:58:13"],
     ]
     # If no round is specified, use the most recent one
     if round is None:
@@ -107,8 +108,10 @@ def get_evalset(round=None):
             index, _ = select_round(dataset, "test", round)
         # Convert to DataFrame
         df = dataset.to_pandas()
-        # Use only these examples
+        # Use only the examples in the selected round
         df = df.iloc[index]
+        # Drop rows with None for judge_noteworthy
+        df = df.dropna(subset=["judge_noteworthy"])
         # Reset the index after subsetting
         df.reset_index(drop=True, inplace=True)
         # Construct y list (ground truth)

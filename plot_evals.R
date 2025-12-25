@@ -54,13 +54,13 @@ concept_drift <- function() {
   axis(1, at = df0$evalset)
   title("Concept Drift Visualization")
   # Add lines
-  lines(df0$evalset, percentage_true, type = "b", pch = 19, lwd = 2)
+  lines(df0$evalset, true_percent, type = "b", pch = 19, lwd = 2)
   lines(df0$evalset, accuracy, type = "b", pch = 19, lwd = 2, lty = 2)
   # Add labels
   text(1, par("usr")[3], "   Development", adj = c(0, 0), srt = 30)
-  text(2, par("usr")[3], "Production -->", adj = c(0.3, -1))
-  text(nrow(df0) + 0.2, tail(true_percent, 1), "'True' Label Frequency\n(User Feedback)", adj = 0, xpd = NA)
-  text(nrow(df0) + 0.2, tail(accuracy, 1), "Baseline Accuracy\n(Unaligned Judge)", adj = 0, xpd = NA)
+  text(2.5, par("usr")[3], "Production -->", adj = c(0.5, -1))
+  text(nrow(df0) + 0.2, tail(true_percent, 1), "'True' label frequency\n(user feedback)", adj = 0, xpd = NA)
+  text(nrow(df0) + 0.2, tail(accuracy, 1), "Baseline accuracy\n(unaligned judge)", adj = 0, xpd = NA)
   #text(1.5, 35, "Over time,\nmore revisions\nare labeled\nnot noteworthy", adj = 0.5)
   dev.off()
 }
@@ -88,7 +88,9 @@ eval_accuracy <- function() {
   # Start plot
   png("image/eval-accuracy.png", width = 800, height = 600, pointsize=24)
   par(mar = c(4, 3.7, 3, 10), mgp = c(2.5, 1, 0), las = 1)
-  plot(range(u_evalsets), range(df_all$accuracy), xlab = "Time Step", ylab = "% Accuracy vs Baseline", type = "n", xaxt = "n")
+  ylim <- range(df_all$accuracy)
+  ylim[1] <- ylim[1] - 2
+  plot(range(u_evalsets), ylim, xlab = "Time Step", ylab = "% Accuracy vs Baseline", type = "n", xaxt = "n")
   axis(1, at = u_evalsets)
   rect(par("usr")[1], par("usr")[3], par("usr")[2], 0, col = "#cccccc", border = NA)
   title("Accuracy vs Baseline")
@@ -100,10 +102,10 @@ eval_accuracy <- function() {
 
   # Add labels
   text(1, par("usr")[3], "   Development", adj = c(0, 0), srt = 30)
-  text(2, par("usr")[3], "Production -->", adj = c(0.3, -1))
-  text(nrow(df1) + 0.2, tail(df1$accuracy, 1), "No realignment\nin production", adj = 0, xpd = NA)
-  text(nrow(df2) + 0.2, tail(df2$accuracy, 1), "Single realignment\nat Time 2", adj = 0, xpd = NA)
-  text(nrow(dfx) + 0.2, tail(dfx$accuracy, 1), "Continuous realignment", adj = 0, xpd = NA)
+  text(2.5, par("usr")[3], "Production -->", adj = c(0.5, -1))
+  text(max(u_evalsets) + 0.2, tail(df1$accuracy, 1), "No realignment\nin production", adj = 0, xpd = NA)
+  text(max(u_evalsets) + 0.2, tail(df2$accuracy, 1), "Single realignment\nat Time Step 2", adj = 0, xpd = NA)
+  text(max(u_evalsets) + 0.2, tail(dfx$accuracy, 1), "Continuous realignment", adj = 0, xpd = NA)
   dev.off()
 
 }
